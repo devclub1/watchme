@@ -78,6 +78,12 @@ socket.on("ice-candidate", (payload) => {
   }
 });
 
+function toFullscreen() {
+  if (!document.fullscreenElement) {
+    const remoteVideo = document.getElementById("remoteVideo");
+    remoteVideo.requestFullscreen();
+  }
+}
 
 function closeVideo() {
   const remoteVideo = document.getElementById("remoteVideo");

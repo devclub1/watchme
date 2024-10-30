@@ -4,13 +4,19 @@
 <head>
   <meta charset="UTF-8">
   <title>WebRTC Screen Viewer</title>
+  <style>
+    #remoteVideo {
+      width: 95vw;
+      height: 90vh;
+    }
+  </style>
   <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
 </head>
 
 <body>
   <h1>Screen Sharing - Viewer</h1>
-  <button>Play me</button>
-  <video id="remoteVideo" width=500 playsinline muted autoplay></video>
+  <button onclick="toFullscreen()">Fullscreen</button>
+  <video id="remoteVideo" playsinline muted autoplay></video>
   <script src="./view.js"></script>
 </body>
 
