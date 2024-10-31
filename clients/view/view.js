@@ -2,15 +2,24 @@
 const socket = io("http://localhost:3000"); // Connect to signaling server
 
 // Channel name for the screen-sharing session
-const channel = "watchme1";
+const channelName = "watchme1";
+
 let peerConnection;
+let ownerId;
 
 // Join the specified channel
-socket.emit("join-channel", channel);
+socket.emit("join-channel", { channel: channelName, type: "viewer" });
+
+socket.on("no-channel", () => {
+  console.log("yeees");
+  socket.disconnect();
+  alert("channel does not exist");
+})
 
 // Handle receiving an offer from the sharer
 socket.on("webrtc-offer", async (payload) => {
   console.log("Offer received from sharer:", payload);
+  ownerId = payload.target;
 
   // Create a new RTCPeerConnection
   peerConnection = new RTCPeerConnection({
@@ -41,7 +50,7 @@ socket.on("webrtc-offer", async (payload) => {
 
   // Send the answer back to the sharer
   socket.emit("webrtc-answer", {
-    channel,
+    channel: channelName,
     sdp: answer,
     from: socket.id // Send the viewer's ID
   });
@@ -50,10 +59,12 @@ socket.on("webrtc-offer", async (payload) => {
   peerConnection.onicecandidate = (event) => {
     if (event.candidate) {
       socket.emit("ice-candidate", {
-        channel,
+        channel: channelName,
         from: socket.id,
+        to: ownerId,
         candidate: event.candidate
       });
+
       console.log("Sent ICE candidate to sharer:", socket.id);
     }
   };
@@ -88,4 +99,6 @@ function toFullscreen() {
 function closeVideo() {
   const remoteVideo = document.getElementById("remoteVideo");
   remoteVideo.srcObject = null;
+  socket.disconnect();
+  peerConnection.close();
 }
