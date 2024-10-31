@@ -1,7 +1,29 @@
 let captureStream = null;
 let socket = null;
 let peerConnections = {};
-const channelName = "watchme1";
+let channelName = null;
+let debounceTimeout = null;
+
+window.addEventListener('load', () => {
+  const channel = document.getElementById("channel");
+
+  if (!!channel.value) {
+    channelName = channel.value;
+    console.log(channelName)
+  }
+});
+
+function toggleButton(id, status) {
+  document.getElementById(id).disabled = !status;
+}
+
+function handleChannelName(event) {
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(() => {
+    channelName = event.target.value;
+    toggleButton("share", true);
+  }, 500);
+}
 
 async function startCapture() {
   try {
@@ -16,6 +38,13 @@ async function startCapture() {
 async function triggerShare() {
   socket = io("http://localhost:3000"); // Connect to signaling server
   captureStream = await startCapture();
+
+  if (!captureStream) {
+    return;
+  }
+
+  toggleButton("share", false);
+  toggleButton("stop", true)
 
   document.getElementById("video").srcObject = captureStream;
   // Channel name for the screen-sharing session
@@ -98,7 +127,11 @@ async function triggerShare() {
 }
 
 function stopShare() {
+  toggleButton("share", true);
+  toggleButton("stop", false);
+
   socket.disconnect();
+
   Object.values(peerConnections).forEach(peerConnection => peerConnection.close());
   captureStream.getTracks()[0].stop();
   document.getElementById("video").srcObject = null;

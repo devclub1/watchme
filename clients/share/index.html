@@ -1,9 +1,11 @@
 <html>
 
 <body>
-  <!-- <button onclick="triggerCapture()">Start capture</button> -->
-  <button id="share" onclick="triggerShare()">Start share</button>
-  <button id="stop" onclick="stopShare()">Stop share</button>
+  <div>
+    <input id="channel" type="text" placeholder="Channel name" onkeyup="handleChannelName(event)" />
+    <button id="share" disabled onclick="triggerShare()">Start share</button>
+    <button id="stop" disabled onclick="stopShare()">Stop share</button>
+  </div>
   <video id="video" width=500 autoplay></video>
   <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
   <script src="./share.js"></script>

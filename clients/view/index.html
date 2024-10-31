@@ -14,9 +14,12 @@
 </head>
 
 <body>
-  <h1>Screen Sharing - Viewer</h1>
-  <button onclick="toFullscreen()">Fullscreen</button>
-  <button onclick="closeVideo()">Stop video</button>
+  <div>
+    <input id="channel" type="text" placeholder="Channel name" onkeyup="handleChannelName(event)" />
+    <button id="join" disabled onclick="joinChannel()">Join channel</button>
+    <button id="fullscreen" disabled onclick="toFullscreen()">Fullscreen</button>
+    <button id="stop" disabled onclick="closeVideo()">Stop video</button>
+  </div>
   <video id="remoteVideo" playsinline muted autoplay></video>
   <script src="./view.js"></script>
 </body>
