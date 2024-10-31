@@ -1,90 +1,143 @@
+const signalingServer = "http://localhost:3000";
+
 let captureStream = null;
 let socket = null;
+let peerConnections = {};
+let channelName = null;
+let debounceTimeout = null;
 
-async function startCapture() {  
-    try {
-      captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-    } catch (err) {
-      console.error(`Error: ${err}`);
-    }
+window.addEventListener('load', () => {
+  const channel = document.getElementById("channel");
 
-    return captureStream;
+  if (!!channel.value) {
+    channelName = channel.value;
+    console.log(channelName)
+  }
+});
+
+function toggleButton(id, status) {
+  document.getElementById(id).disabled = !status;
+}
+
+function handleChannelName(event) {
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(() => {
+    channelName = event.target.value;
+    toggleButton("share", true);
+  }, 500);
+}
+
+async function startCapture() {
+  try {
+    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+  } catch (err) {
+    console.error(`Error: ${err}`);
   }
 
-  async function triggerCapture() {
-    const displayMediaOptions = {
-        video: {
-          displaySurface: "browser",
-        },
-        audio: {
-          suppressLocalAudioPlayback: false,
-        },
-        preferCurrentTab: false,
-        selfBrowserSurface: "exclude",
-        systemAudio: "include",
-        surfaceSwitching: "include",
-        monitorTypeSurfaces: "include",
-      };
+  return captureStream;
+}
 
-    // document.getElementById("video").srcObject = await startCapture(displayMediaOptions);
+async function triggerShare() {
+  socket = io(signalingServer); // Connect to signaling server
+  captureStream = await startCapture();
+
+  if (!captureStream) {
+    return;
   }
 
-  async function triggerShare() {
-    socket = io("http://localhost:3000"); // Connect to signaling server
-    captureStream = await startCapture();
+  toggleButton("share", false);
+  toggleButton("stop", true)
 
-    // Channel name for the screen-sharing session
-    const channel = "watchme1";
-    let peerConnection = new RTCPeerConnection({
-        iceServers: [{urls: "stun:stun.1.google.com:19302"}] // STUN server to help with NAT traversal
+  document.getElementById("video").srcObject = captureStream;
+  // Channel name for the screen-sharing session
+
+  socket.emit("join-channel", { channel: channelName, type: "sharer" });
+
+  socket.on("existing-channel", () => {
+    stopShare();
+    alert("Channel " + channelName + " is already existing");
+  });
+
+  socket.on("user-joined", async (socketId) => {
+    const peerConnection = new RTCPeerConnection({
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "tun:tun_ip:3478", username: "username", credential: "password" }
+      ]
     });
 
     captureStream.getTracks().forEach(track => {
       peerConnection.addTrack(track, captureStream);
       console.log("Added track");
-      console.log(track);
     });
 
-        // Log the tracks being sent
-      peerConnection.getSenders().forEach(sender => {
-          console.log("Sender track:", sender.track);
-      });
+    peerConnections[socketId] = peerConnection;
 
-    // Join the specified channel
-    socket.emit("join-channel", channel);
-    
+    // Log the tracks being sent
+    peerConnection.getSenders().forEach(sender => {
+      console.log("Sender track:", sender.track);
+    });
+
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
 
-    // Send the offer through the signaling server
-    const offerToSend = {channel, sdp: offer};
-    console.log(offerToSend);
-
-    socket.emit("webrtc-offer", offerToSend);
-    console.log("Screen sharing started, offer sent to channel:", channel);
-
-    socket.on("webrtc-answer", (payload) => {
-      peerConnection.setRemoteDescription(new RTCSessionDescription(payload.sdp))
-          .then(() => console.log("Received answer from viewer"))
-          .catch(error => console.error("Error setting remote description:", error));
-    });
-
-    // Handle ICE candidates sent by the viewer
-    socket.on("ice-candidate", (payload) => {
-        peerConnection.addIceCandidate(new RTCIceCandidate(payload.candidate))
-            .then(() => console.log("Added ICE candidate from viewer"))
-            .catch(error => console.error("Error adding ICE candidate:", error));
-    });
-
     // Send ICE candidates to the viewer as they are gathered
     peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-            socket.emit("ice-candidate", {
-                channel,
-                from: socket.id,
-                candidate: event.candidate
-            });
-            console.log("Sent ICE candidate to channel:", channel);
-        }
+      if (event.candidate) {
+        socket.emit("ice-candidate", {
+          channel: channelName,
+          from: socket.id,
+          to: socketId,
+          candidate: event.candidate
+        });
+
+        console.log("Sent ICE candidate to channel:", channelName);
+      }
     };
-  }
+
+    peerConnection.oniceconnectionstatechange = () => {
+      const state = peerConnection.iceConnectionState;
+
+      if (state === "disconnected" || state === "failed") {
+        console.log("Client " + socket.id + "disconnected");
+        peerConnection.close();
+        delete peerConnections[socketId];
+      }
+    }
+
+    // Send the offer through the signaling server
+    const offerToSend = { channel: channelName, target: socketId, sdp: offer };
+    socket.emit("webrtc-offer", offerToSend);
+
+    console.log("Screen sharing started, offer sent to channel:", channelName);
+  });
+
+  socket.on("webrtc-answer", (payload) => {
+    console.log("received answer");
+    console.log(payload);
+
+    peerConnections[payload.from].setRemoteDescription(new RTCSessionDescription(payload.sdp))
+      .then(() => console.log("Received answer from viewer"))
+      .catch(error => console.error("Error setting remote description:", error));
+  });
+
+  // Handle ICE candidates sent by the viewer
+  socket.on("ice-candidate", (payload) => {
+    console.log("received ice candidate")
+
+    peerConnections[payload.from].addIceCandidate(new RTCIceCandidate(payload.candidate))
+      .then(() => console.log("Added ICE candidate from viewer"))
+      .catch(error => console.error("Error adding ICE candidate:", error));
+  });
+}
+
+function stopShare() {
+  toggleButton("share", true);
+  toggleButton("stop", false);
+
+  socket.disconnect();
+
+  Object.values(peerConnections).forEach(peerConnection => peerConnection.close());
+  captureStream.getTracks()[0].stop();
+  document.getElementById("video").srcObject = null;
+}
