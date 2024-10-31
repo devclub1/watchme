@@ -1,3 +1,5 @@
+const signalingServer = "http://localhost:3000";
+
 let captureStream = null;
 let socket = null;
 let peerConnections = {};
@@ -36,7 +38,7 @@ async function startCapture() {
 }
 
 async function triggerShare() {
-  socket = io("http://localhost:3000"); // Connect to signaling server
+  socket = io(signalingServer); // Connect to signaling server
   captureStream = await startCapture();
 
   if (!captureStream) {
@@ -58,7 +60,10 @@ async function triggerShare() {
 
   socket.on("user-joined", async (socketId) => {
     const peerConnection = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.1.google.com:19302" }] // STUN server to help with NAT traversal
+      iceServers: [
+        { urls: "stun:stun.1.google.com:19302" },
+        { urls: "tun:tun_ip:3478", username: "username", credential: "password" }
+      ]
     });
 
     captureStream.getTracks().forEach(track => {

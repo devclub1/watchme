@@ -1,3 +1,5 @@
+const signalingServer = "http://localhost:3000";
+
 let socket;
 let channelName;
 let peerConnection;
@@ -27,7 +29,7 @@ function handleChannelName(event) {
 }
 
 function joinChannel() {
-  socket = io("http://localhost:3000"); // Connect to signaling server
+  socket = io(signalingServer); // Connect to signaling server
   socket.emit("join-channel", { channel: channelName, type: "viewer" });
 
   socket.on("no-channel", () => {
@@ -43,7 +45,10 @@ function joinChannel() {
 
     // Create a new RTCPeerConnection
     peerConnection = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.1.google.com:19302" }] // STUN server
+      iceServers: [
+        { urls: "stun:stun.1.google.com:19302" },
+        { urls: "tun:tun_ip:3478", username: "username", credential: "password" }
+      ]
     });
 
     // Handle incoming tracks from the sharer
