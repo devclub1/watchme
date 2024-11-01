@@ -5,6 +5,7 @@ let socket = null;
 let peerConnections = {};
 let channelName = null;
 let debounceTimeout = null;
+let viewers = 0;
 
 window.addEventListener('load', () => {
   const channel = document.getElementById("channel");
@@ -17,6 +18,10 @@ window.addEventListener('load', () => {
 
 function toggleButton(id, status) {
   document.getElementById(id).disabled = !status;
+}
+
+function toggleElement(id, status) {
+  document.getElementById(id).style.display = status ? "inline-block" : "none";
 }
 
 function handleChannelName(event) {
@@ -47,9 +52,10 @@ async function triggerShare() {
 
   toggleButton("share", false);
   toggleButton("stop", true)
+  toggleElement("viewers", true);
+  toggleElement("overlay-text", true);
 
   document.getElementById("video").srcObject = captureStream;
-  // Channel name for the screen-sharing session
 
   socket.emit("join-channel", { channel: channelName, type: "sharer" });
 
@@ -62,7 +68,7 @@ async function triggerShare() {
     const peerConnection = new RTCPeerConnection({
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
-        { urls: "tun:tun_ip:3478", username: "username", credential: "password" }
+        // { urls: "tun:tun_ip:3478", username: "username", credential: "password" }
       ]
     });
 
@@ -98,7 +104,10 @@ async function triggerShare() {
     peerConnection.oniceconnectionstatechange = () => {
       const state = peerConnection.iceConnectionState;
 
-      if (state === "disconnected" || state === "failed") {
+      if (state === "connected") {
+        updateViewers(true);
+      } else if (state === "disconnected" || state === "failed") {
+        updateViewers(false);
         console.log("Client " + socket.id + "disconnected");
         peerConnection.close();
         delete peerConnections[socketId];
@@ -114,7 +123,6 @@ async function triggerShare() {
 
   socket.on("webrtc-answer", (payload) => {
     console.log("received answer");
-    console.log(payload);
 
     peerConnections[payload.from].setRemoteDescription(new RTCSessionDescription(payload.sdp))
       .then(() => console.log("Received answer from viewer"))
@@ -131,9 +139,16 @@ async function triggerShare() {
   });
 }
 
+function updateViewers(type) {
+  viewers = type ? viewers + 1 : viewers === 0 ? 0 : viewers - 1;
+  document.getElementById("viewersCount").innerText = viewers;
+}
+
 function stopShare() {
   toggleButton("share", true);
   toggleButton("stop", false);
+  toggleElement("viewers", false);
+  toggleElement("overlay-text", false);
 
   socket.disconnect();
 

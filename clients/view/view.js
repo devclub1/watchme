@@ -47,7 +47,7 @@ function joinChannel() {
     peerConnection = new RTCPeerConnection({
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
-        { urls: "tun:tun_ip:3478", username: "username", credential: "password" }
+        // { urls: "tun:tun_ip:3478", username: "username", credential: "password" }
       ]
     });
 
