@@ -208,8 +208,6 @@ async function triggerShare() {
   });
 
   socket.on("webrtc-answer", (payload) => {
-    console.log("received answer");
-
     peerConnections[payload.from].setRemoteDescription(new RTCSessionDescription(payload.sdp))
       .then(() => console.log("Received answer from viewer"))
       .catch(error => console.error("Error setting remote description:", error));
@@ -217,8 +215,6 @@ async function triggerShare() {
 
   // Handle ICE candidates sent by the viewer
   socket.on("ice-candidate", (payload) => {
-    console.log("received ice candidate")
-
     peerConnections[payload.from].addIceCandidate(new RTCIceCandidate(payload.candidate))
       .then(() => console.log("Added ICE candidate from viewer"))
       .catch(error => console.error("Error adding ICE candidate:", error));

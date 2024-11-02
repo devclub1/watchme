@@ -18,7 +18,6 @@ window.addEventListener('load', () => {
 
   if (!!channel.value) {
     channelName = channel.value;
-    console.log(channelName)
   }
 });
 
@@ -120,7 +119,6 @@ function handleChannelName(event) {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(() => {
     channelName = event.target.value;
-    console.log(channelName);
     toggleButton("join", true);
   }, 500);
 }
@@ -130,7 +128,6 @@ function joinChannel() {
   socket.emit("join-channel", { channel: channelName, type: "viewer" });
 
   socket.on("no-channel", () => {
-    console.log("yeees");
     socket.disconnect();
     alert("channel does not exist");
   })
