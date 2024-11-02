@@ -10,6 +10,7 @@
       position: relative;
       z-index: 0;
       width: 500px;
+      margin-top: 10px;
     }
 
     #overlay-text {
@@ -26,6 +27,10 @@
       font-size: 30px;
       align-self: center;
     }
+
+    #settings-container {
+      visibility: hidden;
+    }
   </style>
 </head>
 
@@ -34,6 +39,7 @@
     <input id="channel" type="text" placeholder="Channel name" onkeyup="handleChannelName(event)" />
     <button id="share" disabled onclick="triggerShare()">Start share</button>
     <button id="stop" disabled onclick="stopShare()">Stop share</button>
+    <button id="settings" onclick="toggleSettings()">Settings</button>
     <div id="viewers">
       <span>Number of viewers: </span>
       <span id="viewersCount">0</span>
@@ -45,6 +51,23 @@
       <p id="overlay-text-content">stream preview</p>
     </div>
   </div>
+  <div id="settings-container">
+    <p>Configurations</p>
+    <div id="configurations-container">
+    </div>
+    <button id="add-config" onclick="toggleModal(true)">Add
+      configuration</button>
+    <button id="reset-config" onclick="resetConfig()">Reset configuration</button>
+  </div>
+  <dialog id="add-config-dialog">
+    <form onsubmit="submitNewConfiguration(event)">
+      <input type="text" name="urls" placeholder="url" />
+      <input type="text" name="username" placeholder="username" />
+      <input type="text" name="credential" placeholder="credential" />
+      <input type="submit" value="Add" />
+      <button type="button" onclick="toggleModal(false)">Close</button>
+    </form>
+  </dialog>
   <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
   <script src="./share.js"></script>
 </body>
