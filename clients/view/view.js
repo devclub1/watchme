@@ -1,10 +1,13 @@
 const signalingServer = "http://localhost:3000";
+const defaultConfigurations = [{ urls: "stun:stun.l.google.com:19302" }]
 
 let socket;
 let channelName;
 let peerConnection;
 let ownerId;
 let debounceTimeout;
+let configurations = [];
+let displaySettings = false;
 
 function toggleButton(id, status) {
   document.getElementById(id).disabled = !status;
@@ -18,6 +21,100 @@ window.addEventListener('load', () => {
     console.log(channelName)
   }
 });
+
+function loadConfig() {
+  if (configurations.length === 0) {
+    const storedConfigurations = localStorage.getItem("configurations");
+
+    if (!!storedConfigurations) {
+      configurations = JSON.parse(storedConfigurations);
+    } else {
+      configurations = JSON.parse(JSON.stringify(defaultConfigurations));
+    }
+  }
+
+  const container = document.getElementById("configurations-container");
+  container.innerHTML = "";
+
+  configurations.forEach((configuration, index) => {
+    const configContainer = document.createElement("div");
+    configContainer.style.margin = "20px";
+
+    if (!!configuration.urls) {
+      const paragraph = document.createElement("p");
+      paragraph.innerText = "urls: " + configuration.urls;
+      configContainer.appendChild(paragraph);
+    }
+
+    if (!!configuration.username) {
+      const paragraph = document.createElement("p");
+      paragraph.innerText = "username: " + configuration.username;
+      configContainer.appendChild(paragraph);
+    }
+
+    if (!!configuration.credential) {
+      const paragraph = document.createElement("p");
+      paragraph.innerText = "credential: " + configuration.credential;
+      configContainer.appendChild(paragraph);
+    }
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "remove";
+    deleteButton.onclick = () => removeConfig(index)
+    configContainer.appendChild(deleteButton);
+
+    container.appendChild(configContainer);
+  });
+}
+
+function toggleSettings() {
+  displaySettings = !displaySettings;
+
+  const settings = document.getElementById("settings-container");
+  settings.style.display = displaySettings ? "block" : "none";
+  settings.style.visibility = displaySettings ? "visible" : "hidden";
+
+  if (displaySettings) {
+    loadConfig();
+  }
+}
+
+function toggleModal(status) {
+  const modal = document.getElementById("add-config-dialog");
+
+  if (status) {
+    modal.showModal();
+  } else {
+    modal.close();
+  }
+}
+
+function submitNewConfiguration(event) {
+  event.preventDefault();
+
+  const data = Object.fromEntries(new FormData(event.target).entries().filter(([_, value]) => value !== null && value != undefined && value !== ''));
+
+  if (!!data.urls) {
+    configurations.push(data);
+    localStorage.setItem("configurations", JSON.stringify(configurations));
+    toggleModal(false);
+    loadConfig();
+  } else {
+    alert("URL parameter cannot be empty");
+  }
+}
+
+function removeConfig(index) {
+  configurations.splice(index, 1);
+  localStorage.setItem("configurations", JSON.stringify(configurations));
+  loadConfig();
+}
+
+function resetConfig() {
+  localStorage.removeItem("configurations");
+  configurations = [];
+  loadConfig();
+}
 
 function handleChannelName(event) {
   clearTimeout(debounceTimeout);
@@ -47,7 +144,6 @@ function joinChannel() {
     peerConnection = new RTCPeerConnection({
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
-        { urls: "tun:tun_ip:3478", username: "username", credential: "password" }
       ]
     });
 

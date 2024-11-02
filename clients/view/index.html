@@ -9,8 +9,13 @@
       width: 95vw;
       height: 90vh;
     }
+
+    #settings-container {
+      margin: 10px;
+      display: none;
+      visibility: hidden;
+    }
   </style>
-  <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
 </head>
 
 <body>
@@ -19,8 +24,27 @@
     <button id="join" disabled onclick="joinChannel()">Join channel</button>
     <button id="fullscreen" disabled onclick="toFullscreen()">Fullscreen</button>
     <button id="stop" disabled onclick="closeVideo()">Stop video</button>
+    <button id="settings" onclick="toggleSettings()">Settings</button>
+  </div>
+  <div id="settings-container">
+    <p>Configurations</p>
+    <div id="configurations-container">
+    </div>
+    <button id="add-config" onclick="toggleModal(true)">Add
+      configuration</button>
+    <button id="reset-config" onclick="resetConfig()">Reset configuration</button>
   </div>
   <video id="remoteVideo" playsinline muted autoplay></video>
+  <dialog id="add-config-dialog">
+    <form onsubmit="submitNewConfiguration(event)">
+      <input type="text" name="urls" placeholder="url" />
+      <input type="text" name="username" placeholder="username" />
+      <input type="text" name="credential" placeholder="credential" />
+      <input type="submit" value="Add" />
+      <button type="button" onclick="toggleModal(false)">Close</button>
+    </form>
+  </dialog>
+  <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
   <script src="./view.js"></script>
 </body>
 
