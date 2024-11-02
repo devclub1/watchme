@@ -8,10 +8,6 @@ const io = socketIo(server);
 
 const PORT = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-  res.send("WebRTC Signaling Server is running");
-});
-
 app.use(express.static('../clients'))
 
 const rooms = {};
