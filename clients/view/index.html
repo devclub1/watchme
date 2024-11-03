@@ -3,9 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>WebRTC Screen Viewer</title>
+  <title>watchme - viewer</title>
   <style>
     #remoteVideo {
+      margin-top: 5px;
       width: 95vw;
       height: 90vh;
     }
@@ -34,7 +35,7 @@
       configuration</button>
     <button id="reset-config" onclick="resetConfig()">Reset configuration</button>
   </div>
-  <video id="remoteVideo" playsinline muted autoplay></video>
+  <video id="remoteVideo" playsinline autoplay></video>
   <dialog id="add-config-dialog">
     <form onsubmit="submitNewConfiguration(event)">
       <input type="text" name="urls" placeholder="url" />

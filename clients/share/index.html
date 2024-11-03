@@ -1,6 +1,8 @@
 <html>
 
 <head>
+  <meta charset="UTF-8">
+  <title>watchme - sharer</title>
   <style>
     #viewers {
       display: none;
@@ -31,13 +33,21 @@
     #settings-container {
       visibility: hidden;
     }
+
+    #configurations-container {
+      margin-left: 5px;
+    }
+
+    #audio-container {
+      margin: 20px 5px;
+    }
   </style>
 </head>
 
 <body>
   <div>
     <input id="channel" type="text" placeholder="Channel name" onkeyup="handleChannelName(event)" />
-    <button id="share" disabled onclick="triggerShare()">Start share</button>
+    <button id="share" disabled onclick="startShare()">Start share</button>
     <button id="stop" disabled onclick="stopShare()">Stop share</button>
     <button id="settings" onclick="toggleSettings()">Settings</button>
     <div id="viewers">
@@ -46,12 +56,19 @@
     </div>
   </div>
   <div id="video-container">
-    <video id="video" width=500 autoplay></video>
+    <video id="video" width=500 autoplay muted></video>
     <div id="overlay-text">
       <p id="overlay-text-content">stream preview</p>
     </div>
   </div>
   <div id="settings-container">
+    <p>Settings</p>
+    <div id="audio-container">
+      <input type="checkbox" name="captureSystem" onchange="toggleAudio(event, 'system')" />
+      <label for="captureAudio">System audio</label>
+      <input type="checkbox" name="captureMic" onchange="toggleAudio(event, 'mic')" />
+      <label for="captureAudio">Microphone audio</label>
+    </div>
     <p>Configurations</p>
     <div id="configurations-container">
     </div>
