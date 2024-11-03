@@ -66,8 +66,9 @@
     <div id="audio-container">
       <input type="checkbox" name="captureSystem" onchange="toggleAudio(event, 'system')" />
       <label for="captureAudio">System audio</label>
-      <input type="checkbox" name="captureMic" onchange="toggleAudio(event, 'mic')" />
-      <label for="captureAudio">Microphone audio</label>
+      <input type="checkbox" name="captureMic" id="captureMic" onchange="toggleAudio(event, 'mic')"
+        title="Microphone cannot be enabled after a stream has started" />
+      <label for="captureAudio" title="Microphone cannot be enabled after a stream has started">Microphone audio</label>
     </div>
     <p>Configurations</p>
     <div id="configurations-container">
