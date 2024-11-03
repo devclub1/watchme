@@ -75,6 +75,9 @@ function loadConfig() {
 async function toggleAudio(event, type) {
   if (type === "system") {
     captureSystemAudio = event.target.checked;
+    if (captureStream && captureStream.getAudioTracks().length > 0) {
+      captureStream.getAudioTracks()[0].enabled = captureSystemAudio;
+    }
   } else if (type === "mic") {
     captureMic = event.target.checked;
   }
@@ -135,7 +138,11 @@ function handleChannelName(event) {
 
 async function startCapture() {
   try {
-    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: captureSystemAudio ? { supressLocalAudioPlayback: true } : false });
+    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: { supressLocalAudioPlayback: true } });
+
+    if (captureStream.getAudioTracks().length > 0) {
+      captureStream.getAudioTracks()[0].enabled = captureSystemAudio;
+    }
   } catch (err) {
     console.error(`Error: ${err}`);
   }
