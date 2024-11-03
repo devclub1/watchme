@@ -2,13 +2,20 @@ const signalingServer = "http://localhost:3000";
 const defaultConfigurations = [{ urls: "stun:stun.l.google.com:19302" }]
 
 let captureStream = null;
+let captureMicStream = null;
+
 let socket = null;
 let peerConnections = {};
-let channelName = null;
+
 let debounceTimeout = null;
+
+let channelName = null;
 let viewers = 0
-let configurations = [];
+
 let displaySettings = false;
+let configurations = [];
+let captureSystemAudio = false;
+let captureMic = false;
 
 window.addEventListener('load', () => {
   const channel = document.getElementById("channel");
@@ -63,6 +70,14 @@ function loadConfig() {
 
     container.appendChild(configContainer);
   });
+}
+
+async function toggleAudio(event, type) {
+  if (type === "system") {
+    captureSystemAudio = event.target.checked;
+  } else if (type === "mic") {
+    captureMic = event.target.checked;
+  }
 }
 
 function toggleModal(status) {
@@ -120,12 +135,18 @@ function handleChannelName(event) {
 
 async function startCapture() {
   try {
-    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: captureSystemAudio ? { supressLocalAudioPlayback: true } : false });
   } catch (err) {
     console.error(`Error: ${err}`);
   }
+}
 
-  return captureStream;
+async function startMicCapture() {
+  try {
+    captureMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    console.error(`Error: ${err}`);
+  }
 }
 
 function toggleSettings() {
@@ -133,12 +154,20 @@ function toggleSettings() {
   document.getElementById("settings-container").style.visibility = displaySettings ? "visible" : "hidden";
 }
 
-async function triggerShare() {
+async function startShare() {
   socket = io(signalingServer); // Connect to signaling server
-  captureStream = await startCapture();
+  await startCapture();
 
   if (!captureStream) {
     return;
+  }
+
+  if (captureMic) {
+    await startMicCapture();
+
+    if (!captureMicStream) {
+      return;
+    }
   }
 
   toggleButton("share", false);
@@ -160,8 +189,15 @@ async function triggerShare() {
 
     captureStream.getTracks().forEach(track => {
       peerConnection.addTrack(track, captureStream);
-      console.log("Added track");
+      console.log("Added device video/audio track");
     });
+
+    if (captureMic) {
+      captureMicStream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, captureStream);
+        console.log("Added mic track");
+      })
+    }
 
     peerConnections[socketId] = peerConnection;
 
@@ -194,7 +230,7 @@ async function triggerShare() {
         updateViewers(true);
       } else if (state === "disconnected" || state === "failed") {
         updateViewers(false);
-        console.log("Client " + socket.id + "disconnected");
+        console.log("Client " + socket.id + " disconnected");
         peerConnection.close();
         delete peerConnections[socketId];
       }
@@ -208,8 +244,6 @@ async function triggerShare() {
   });
 
   socket.on("webrtc-answer", (payload) => {
-    console.log("received answer");
-
     peerConnections[payload.from].setRemoteDescription(new RTCSessionDescription(payload.sdp))
       .then(() => console.log("Received answer from viewer"))
       .catch(error => console.error("Error setting remote description:", error));
@@ -217,8 +251,6 @@ async function triggerShare() {
 
   // Handle ICE candidates sent by the viewer
   socket.on("ice-candidate", (payload) => {
-    console.log("received ice candidate")
-
     peerConnections[payload.from].addIceCandidate(new RTCIceCandidate(payload.candidate))
       .then(() => console.log("Added ICE candidate from viewer"))
       .catch(error => console.error("Error adding ICE candidate:", error));
@@ -239,6 +271,11 @@ function stopShare() {
   socket.disconnect();
 
   Object.values(peerConnections).forEach(peerConnection => peerConnection.close());
-  captureStream.getTracks()[0].stop();
+
+  captureStream.getTracks().forEach(track => track.stop());
+  if (captureMic) {
+    captureMicStream.getTracks().forEach(track => track.stop());
+  }
+
   document.getElementById("video").srcObject = null;
 }

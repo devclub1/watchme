@@ -2,9 +2,11 @@ const signalingServer = "http://localhost:3000";
 const defaultConfigurations = [{ urls: "stun:stun.l.google.com:19302" }]
 
 let socket;
-let channelName;
 let peerConnection;
+
+let channelName;
 let ownerId;
+
 let debounceTimeout;
 let configurations = [];
 let displaySettings = false;
@@ -18,7 +20,6 @@ window.addEventListener('load', () => {
 
   if (!!channel.value) {
     channelName = channel.value;
-    console.log(channelName)
   }
 });
 
@@ -120,7 +121,6 @@ function handleChannelName(event) {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(() => {
     channelName = event.target.value;
-    console.log(channelName);
     toggleButton("join", true);
   }, 500);
 }
@@ -130,7 +130,6 @@ function joinChannel() {
   socket.emit("join-channel", { channel: channelName, type: "viewer" });
 
   socket.on("no-channel", () => {
-    console.log("yeees");
     socket.disconnect();
     alert("channel does not exist");
   })
@@ -150,9 +149,6 @@ function joinChannel() {
     // Handle incoming tracks from the sharer
     peerConnection.ontrack = (event) => {
       console.log("Track event received:", event); // Log the event
-      console.log("Received track:", event.track); // Log the track itself
-      console.log("Track kind:", event.track.kind); // Check if it's video or audio
-      console.log(event.streams);
 
       const mediaStream = event.streams[0];
       console.log("Receiving stream:", mediaStream);
