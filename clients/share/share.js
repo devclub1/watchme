@@ -75,11 +75,15 @@ function loadConfig() {
 async function toggleAudio(event, type) {
   if (type === "system") {
     captureSystemAudio = event.target.checked;
-    if (captureStream && captureStream.getAudioTracks().length > 0) {
+    if (!!captureStream && captureStream.getAudioTracks().length > 0) {
       captureStream.getAudioTracks()[0].enabled = captureSystemAudio;
     }
   } else if (type === "mic") {
     captureMic = event.target.checked;
+
+    if (!!captureMicStream && captureMicStream.getAudioTracks().length > 0) {
+      captureMicStream.getAudioTracks()[0].enabled = captureMic;
+    }
   }
 }
 
@@ -175,6 +179,8 @@ async function startShare() {
     if (!captureMicStream) {
       return;
     }
+  } else {
+    document.getElementById("captureMic").disabled = true;
   }
 
   toggleButton("share", false);
@@ -284,5 +290,11 @@ function stopShare() {
     captureMicStream.getTracks().forEach(track => track.stop());
   }
 
+  captureStream = null;
+  captureMicStream = null;
+
+  viewers = 0;
+  updateViewers(false);
   document.getElementById("video").srcObject = null;
+  document.getElementById("captureMic").disabled = false;
 }
