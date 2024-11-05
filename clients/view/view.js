@@ -11,6 +11,8 @@ let debounceTimeout;
 let configurations = [];
 let displaySettings = false;
 
+let shouldDisconnect = false;
+
 function toggleButton(id, status) {
   document.getElementById(id).disabled = !status;
 }
@@ -126,10 +128,13 @@ function handleChannelName(event) {
 }
 
 function joinChannel() {
+  shouldDisconnect = false;
+
   socket = io(signalingServer); // Connect to signaling server
   socket.emit("join-channel", { channel: channelName, type: "viewer" });
 
   socket.on("no-channel", () => {
+    shouldDisconnect = true;
     socket.disconnect();
     alert("channel does not exist");
   })
@@ -195,6 +200,13 @@ function joinChannel() {
           toggleButton("stop", true);
           break;
         case "disconnected":
+          if (shouldDisconnect) {
+            console.log("correctly disconnected");
+          } else {
+            console.log("unexpected disconnect, trying reconnection");
+            joinChannel();
+            break;
+          }
         case "closed":
         case "failed":
           closeVideo();
@@ -224,6 +236,8 @@ function closeVideo() {
   remoteVideo.srcObject = null;
   socket.disconnect();
   peerConnection.close();
+
+  shouldDisconnect = true;
 
   toggleButton("fullscreen", false);
   toggleButton("stop", false);
