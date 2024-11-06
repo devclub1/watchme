@@ -204,6 +204,7 @@ function joinChannel() {
             console.log("correctly disconnected");
           } else {
             console.log("unexpected disconnect, trying reconnection");
+            socket.disconnect();
             joinChannel();
             break;
           }
