@@ -8,7 +8,7 @@ const io = socketIo(server);
 
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static('../clients'))
+app.use(express.static('../fe'))
 
 const rooms = {};
 
