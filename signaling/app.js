@@ -1,10 +1,11 @@
 const express = require("express");
 const http = require("http");
-const socketIo = require("socket.io");
+const socketio = require("socket.io");
+const validator = require("validator");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketio(server);
 
 const PORT = process.env.PORT || 3000;
 
@@ -19,30 +20,31 @@ io.on("connection", (socket) => {
 
   // Join a specific channel (room) selected by the user
   socket.on("join-channel", (joinMessage) => {
+    const sanitizedChannel = validator.escape(joinMessage.channel);
 
-    if (!rooms[joinMessage.channel]) {
+    if (!rooms[sanitizedChannel]) {
       if (joinMessage.type === "sharer") {
-        socket.join(joinMessage.channel)
-        rooms[joinMessage.channel] = { sharer: socket.id, viewers: [] };
-        console.log("Client " + socket.id + " started the channel " + joinMessage.channel);
-        channel = joinMessage.channel;
+        socket.join(sanitizedChannel)
+        rooms[sanitizedChannel] = { sharer: socket.id, viewers: [] };
+        console.log("Client " + socket.id + " started the channel " + sanitizedChannel);
+        channel = sanitizedChannel;
       } else {
-        console.log("Client " + socket.id + " tried to join a non-existing channel " + joinMessage.channel);
+        console.log("Client " + socket.id + " tried to join a non-existing channel " + sanitizedChannel);
         socket.emit("no-channel", {});
       }
     } else {
       if (joinMessage.type === "viewer") {
-        socket.join(joinMessage.channel)
-        rooms[joinMessage.channel].viewers.push(socket.id);
-        console.log(`${socket.id} joined channel: ${joinMessage.channel}`);
-        channel = joinMessage.channel;
+        socket.join(sanitizedChannel)
+        rooms[sanitizedChannel].viewers.push(socket.id);
+        console.log(`${socket.id} joined channel: ${sanitizedChannel}`);
+        channel = sanitizedChannel;
       } else {
         socket.emit("existing-channel");
       }
     }
 
     // Notify other users in the channel about a new participant
-    socket.to(joinMessage.channel).emit("user-joined", socket.id);
+    socket.to(sanitizedChannel).emit("user-joined", socket.id);
   });
 
   // Handle receiving SDP offer or answer from a peer
