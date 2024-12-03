@@ -142,7 +142,7 @@ function handleChannelName(event) {
 
 async function startCapture() {
   try {
-    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: { supressLocalAudioPlayback: true } });
+    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: captureSystemAudio ? { supressLocalAudioPlayback: true } : false });
 
     if (captureStream.getAudioTracks().length > 0) {
       captureStream.getAudioTracks()[0].enabled = captureSystemAudio;
@@ -220,7 +220,8 @@ async function startShare() {
     });
 
     const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
+    const modifiedOffer = offer.sdp.replace("VP8", "H264");
+    await peerConnection.setLocalDescription(new RTCSessionDescription({ type: "offer", sdp: modifiedOffer }));
 
     // Send ICE candidates to the viewer as they are gathered
     peerConnection.onicecandidate = (event) => {
