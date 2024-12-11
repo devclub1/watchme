@@ -1,6 +1,8 @@
 const signalingServer = "http://localhost:3000";
 const defaultConfigurations = [{ urls: "stun:stun.l.google.com:19302" }]
 
+let contentHint = "detail";
+
 let captureStream = null;
 let captureMicStream = null;
 
@@ -143,6 +145,11 @@ function handleChannelName(event) {
 async function startCapture() {
   try {
     captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: captureSystemAudio ? { supressLocalAudioPlayback: true } : false });
+
+    if (captureStream.getVideoTracks().length > 0) {
+      captureStream.getVideoTracks()[0].contentHint = contentHint;
+    }
+
 
     if (captureStream.getAudioTracks().length > 0) {
       captureStream.getAudioTracks()[0].enabled = captureSystemAudio;
