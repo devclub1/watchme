@@ -205,7 +205,12 @@ async function startShare() {
   });
 
   socket.on("user-joined", async (socketId) => {
-    const peerConnection = new RTCPeerConnection({ iceServers: configurations });
+    const peerConnection = new RTCPeerConnection({
+      iceServers: configurations,
+      bundlePolicy: "max-bundle",
+      rtcpMuxPolicy: "require",
+      sdpSemantics: "unified-plan",
+    });
 
     captureStream.getTracks().forEach(track => {
       peerConnection.addTrack(track, captureStream);
