@@ -150,7 +150,6 @@ async function startCapture() {
       captureStream.getVideoTracks()[0].contentHint = contentHint;
     }
 
-
     if (captureStream.getAudioTracks().length > 0) {
       captureStream.getAudioTracks()[0].enabled = captureSystemAudio;
     }
@@ -173,7 +172,7 @@ function toggleSettings() {
 }
 
 async function startShare() {
-  socket = io(signalingServer); // Connect to signaling server
+  socket = io(signalingServer);
   await startCapture();
 
   if (!captureStream) {
@@ -226,7 +225,6 @@ async function startShare() {
 
     peerConnections[socketId] = peerConnection;
 
-    // Log the tracks being sent
     peerConnection.getSenders().forEach(sender => {
       console.log("Sender track:", sender.track);
     });
@@ -235,7 +233,6 @@ async function startShare() {
     const modifiedOffer = offer.sdp.replace("VP8", "H264");
     await peerConnection.setLocalDescription(new RTCSessionDescription({ type: "offer", sdp: modifiedOffer }));
 
-    // Send ICE candidates to the viewer as they are gathered
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
         socket.emit("ice-candidate", {
@@ -262,7 +259,6 @@ async function startShare() {
       }
     }
 
-    // Send the offer through the signaling server
     const offerToSend = { channel: channelName, target: socketId, sdp: offer };
     socket.emit("webrtc-offer", offerToSend);
 
@@ -275,7 +271,6 @@ async function startShare() {
       .catch(error => console.error("Error setting remote description:", error));
   });
 
-  // Handle ICE candidates sent by the viewer
   socket.on("ice-candidate", (payload) => {
     peerConnections[payload.from].addIceCandidate(new RTCIceCandidate(payload.candidate))
       .then(() => console.log("Added ICE candidate from viewer"))
