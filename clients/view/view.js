@@ -130,7 +130,7 @@ function handleChannelName(event) {
 function joinChannel() {
   shouldDisconnect = false;
 
-  socket = io(signalingServer); // Connect to signaling server
+  socket = io(signalingServer);
   socket.emit("join-channel", { channel: channelName, type: "viewer" });
 
   socket.on("no-channel", () => {
@@ -139,45 +139,38 @@ function joinChannel() {
     alert("channel does not exist");
   })
 
-  // Handle receiving an offer from the sharer
   socket.on("webrtc-offer", async (payload) => {
     console.log("Offer received from sharer:", payload);
     ownerId = payload.target;
 
-    // Create a new RTCPeerConnection
     peerConnection = new RTCPeerConnection({
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
       ]
     });
 
-    // Handle incoming tracks from the sharer
     peerConnection.ontrack = (event) => {
-      console.log("Track event received:", event); // Log the event
+      console.log("Track event received:", event);
 
       const mediaStream = event.streams[0];
       console.log("Receiving stream:", mediaStream);
-      console.log("Tracks in stream:", mediaStream.getTracks()); // Check the tracks
+      console.log("Tracks in stream:", mediaStream.getTracks());
 
       const remoteVideo = document.getElementById("remoteVideo");
-      remoteVideo.srcObject = event.streams[0]; // Set the received stream to the video element
+      remoteVideo.srcObject = event.streams[0];
     };
 
-    // Set the received offer as the remote description
     await peerConnection.setRemoteDescription(new RTCSessionDescription(payload.sdp));
 
-    // Create an answer and set it as the local description
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
 
-    // Send the answer back to the sharer
     socket.emit("webrtc-answer", {
       channel: channelName,
       sdp: answer,
-      from: socket.id // Send the viewer's ID
+      from: socket.id
     });
 
-    // Handle ICE candidates
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
         socket.emit("ice-candidate", {
@@ -191,7 +184,7 @@ function joinChannel() {
       }
     };
 
-    peerConnection.onconnectionstatechange = (ev) => {
+    peerConnection.onconnectionstatechange = () => {
       console.log(peerConnection.connectionState)
       switch (peerConnection.connectionState) {
         case "connected":
@@ -215,7 +208,6 @@ function joinChannel() {
     }
   });
 
-  // Handle ICE candidates received from the sharer
   socket.on("ice-candidate", (payload) => {
     if (peerConnection) {
       peerConnection.addIceCandidate(new RTCIceCandidate(payload.candidate))

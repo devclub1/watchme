@@ -1,6 +1,8 @@
 const signalingServer = "http://localhost:3000";
 const defaultConfigurations = [{ urls: "stun:stun.l.google.com:19302" }]
 
+let contentHint = "detail";
+
 let captureStream = null;
 let captureMicStream = null;
 
@@ -142,7 +144,11 @@ function handleChannelName(event) {
 
 async function startCapture() {
   try {
-    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: { supressLocalAudioPlayback: true } });
+    captureStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: captureSystemAudio ? { supressLocalAudioPlayback: true } : false });
+
+    if (captureStream.getVideoTracks().length > 0) {
+      captureStream.getVideoTracks()[0].contentHint = contentHint;
+    }
 
     if (captureStream.getAudioTracks().length > 0) {
       captureStream.getAudioTracks()[0].enabled = captureSystemAudio;
@@ -166,7 +172,7 @@ function toggleSettings() {
 }
 
 async function startShare() {
-  socket = io(signalingServer); // Connect to signaling server
+  socket = io(signalingServer);
   await startCapture();
 
   if (!captureStream) {
@@ -198,7 +204,12 @@ async function startShare() {
   });
 
   socket.on("user-joined", async (socketId) => {
-    const peerConnection = new RTCPeerConnection({ iceServers: configurations });
+    const peerConnection = new RTCPeerConnection({
+      iceServers: configurations,
+      bundlePolicy: "max-bundle",
+      rtcpMuxPolicy: "require",
+      sdpSemantics: "unified-plan",
+    });
 
     captureStream.getTracks().forEach(track => {
       peerConnection.addTrack(track, captureStream);
@@ -214,15 +225,14 @@ async function startShare() {
 
     peerConnections[socketId] = peerConnection;
 
-    // Log the tracks being sent
     peerConnection.getSenders().forEach(sender => {
       console.log("Sender track:", sender.track);
     });
 
     const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
+    const modifiedOffer = offer.sdp.replace("VP8", "H264");
+    await peerConnection.setLocalDescription(new RTCSessionDescription({ type: "offer", sdp: modifiedOffer }));
 
-    // Send ICE candidates to the viewer as they are gathered
     peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
         socket.emit("ice-candidate", {
@@ -249,7 +259,6 @@ async function startShare() {
       }
     }
 
-    // Send the offer through the signaling server
     const offerToSend = { channel: channelName, target: socketId, sdp: offer };
     socket.emit("webrtc-offer", offerToSend);
 
@@ -262,7 +271,6 @@ async function startShare() {
       .catch(error => console.error("Error setting remote description:", error));
   });
 
-  // Handle ICE candidates sent by the viewer
   socket.on("ice-candidate", (payload) => {
     peerConnections[payload.from].addIceCandidate(new RTCIceCandidate(payload.candidate))
       .then(() => console.log("Added ICE candidate from viewer"))

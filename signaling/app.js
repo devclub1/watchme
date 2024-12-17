@@ -13,7 +13,6 @@ app.use(express.static('../clients'))
 
 const rooms = {};
 
-// Handle WebSocket connections
 io.on("connection", (socket) => {
   let channel;
   console.log("New client connected:", socket.id);
