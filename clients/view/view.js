@@ -144,20 +144,19 @@ function joinChannel() {
     ownerId = payload.target;
 
     peerConnection = new RTCPeerConnection({
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-      ]
+      iceServers: configurations,
+      bundlePolicy: "max-bundle",
+      rtcpMuxPolicy: "require",
+      sdpSemantics: "unified-plan",
+      iceCandidatePoolSize: 10
     });
 
     peerConnection.ontrack = (event) => {
       console.log("Track event received:", event);
-
       const mediaStream = event.streams[0];
-      console.log("Receiving stream:", mediaStream);
-      console.log("Tracks in stream:", mediaStream.getTracks());
-
       const remoteVideo = document.getElementById("remoteVideo");
-      remoteVideo.srcObject = event.streams[0];
+      remoteVideo.srcObject = mediaStream;
+      remoteVideo.style.transform = 'translateZ(0)';
     };
 
     await peerConnection.setRemoteDescription(new RTCSessionDescription(payload.sdp));

@@ -209,11 +209,43 @@ async function startShare() {
       bundlePolicy: "max-bundle",
       rtcpMuxPolicy: "require",
       sdpSemantics: "unified-plan",
+      iceCandidatePoolSize: 10
     });
 
+    const videoEncodings = [
+      {
+        rid: 'high',
+        maxBitrate: 3000000,
+        maxFramerate: 60,
+        scaleResolutionDownBy: 1
+      },
+      {
+        rid: 'medium',
+        maxBitrate: 1000000,
+        maxFramerate: 30,
+        scaleResolutionDownBy: 2
+      },
+      {
+        rid: 'low',
+        maxBitrate: 500000,
+        maxFramerate: 15,
+        scaleResolutionDownBy: 4
+      }
+    ];
+
     captureStream.getTracks().forEach(track => {
-      peerConnection.addTrack(track, captureStream);
-      console.log("Added device video/audio track");
+      if (track.kind === 'video') {
+        const sender = peerConnection.addTrack(track, captureStream);
+        
+        const params = sender.getParameters();
+        params.encodings = videoEncodings;
+        sender.setParameters(params);
+
+        console.log("Added device video track with simulcast encodings");
+      } else {
+        peerConnection.addTrack(track, captureStream);
+        console.log("Added device audio track");
+      }
     });
 
     if (captureMic) {
