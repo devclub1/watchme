@@ -17,6 +17,10 @@ function toggleButton(id, status) {
   document.getElementById(id).disabled = !status;
 }
 
+function toggleElement(id, status) {
+  document.getElementById(id).classList.toggle("hidden", !status);
+}
+
 window.addEventListener('load', () => {
   const channel = document.getElementById("channel");
 
@@ -41,29 +45,38 @@ function loadConfig() {
 
   configurations.forEach((configuration, index) => {
     const configContainer = document.createElement("div");
-    configContainer.style.margin = "20px";
+    configContainer.className = "flex justify-between items-center p-4 rounded-lg";
+
+    const configInfo = document.createElement("div");
+    configInfo.className = "space-y-1";
 
     if (!!configuration.urls) {
       const paragraph = document.createElement("p");
+      paragraph.className = "text-gray-700";
       paragraph.innerText = "urls: " + configuration.urls;
-      configContainer.appendChild(paragraph);
+      configInfo.appendChild(paragraph);
     }
 
     if (!!configuration.username) {
       const paragraph = document.createElement("p");
+      paragraph.className = "text-gray-700";
       paragraph.innerText = "username: " + configuration.username;
-      configContainer.appendChild(paragraph);
+      configInfo.appendChild(paragraph);
     }
 
     if (!!configuration.credential) {
       const paragraph = document.createElement("p");
+      paragraph.className = "text-gray-700";
       paragraph.innerText = "credential: " + configuration.credential;
-      configContainer.appendChild(paragraph);
+      configInfo.appendChild(paragraph);
     }
 
+    configContainer.appendChild(configInfo);
+
     const deleteButton = document.createElement("button");
-    deleteButton.textContent = "remove";
-    deleteButton.onclick = () => removeConfig(index)
+    deleteButton.textContent = "Remove";
+    deleteButton.className = "px-4 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black";
+    deleteButton.onclick = () => removeConfig(index);
     configContainer.appendChild(deleteButton);
 
     container.appendChild(configContainer);
@@ -72,10 +85,7 @@ function loadConfig() {
 
 function toggleSettings() {
   displaySettings = !displaySettings;
-
-  const settings = document.getElementById("settings-container");
-  settings.style.display = displaySettings ? "block" : "none";
-  settings.style.visibility = displaySettings ? "visible" : "hidden";
+  toggleElement("settings-container", displaySettings);
 
   if (displaySettings) {
     loadConfig();
@@ -136,7 +146,7 @@ function joinChannel() {
   socket.on("no-channel", () => {
     shouldDisconnect = true;
     socket.disconnect();
-    alert("channel does not exist");
+    alert("The stream has ended");
   })
 
   socket.on("webrtc-offer", async (payload) => {
@@ -154,8 +164,9 @@ function joinChannel() {
     peerConnection.ontrack = (event) => {
       console.log("Track event received:", event);
       const mediaStream = event.streams[0];
-      const remoteVideo = document.getElementById("remoteVideo");
+      const remoteVideo = document.getElementById("remote-video");
       remoteVideo.srcObject = mediaStream;
+      remoteVideo.controls = true;
       remoteVideo.style.transform = 'translateZ(0)';
     };
 
@@ -190,6 +201,7 @@ function joinChannel() {
           toggleButton("join", false);
           toggleButton("fullscreen", true);
           toggleButton("stop", true);
+          toggleButton("settings", false);          
           break;
         case "disconnected":
           if (shouldDisconnect) {
@@ -218,14 +230,15 @@ function joinChannel() {
 
 function toFullscreen() {
   if (!document.fullscreenElement) {
-    const remoteVideo = document.getElementById("remoteVideo");
+    const remoteVideo = document.getElementById("remote-video");
     remoteVideo.requestFullscreen();
   }
 }
 
 function closeVideo() {
-  const remoteVideo = document.getElementById("remoteVideo");
+  const remoteVideo = document.getElementById("remote-video");
   remoteVideo.srcObject = null;
+  remoteVideo.controls = false;
   socket.disconnect();
   peerConnection.close();
 
@@ -234,4 +247,5 @@ function closeVideo() {
   toggleButton("fullscreen", false);
   toggleButton("stop", false);
   toggleButton("join", true);
+  toggleButton("settings", true);
 }

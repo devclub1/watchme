@@ -45,29 +45,38 @@ function loadConfig() {
 
   configurations.forEach((configuration, index) => {
     const configContainer = document.createElement("div");
-    configContainer.style.margin = "20px";
+    configContainer.className = "flex justify-between items-center p-4 bg-gray-50 rounded-lg";
+
+    const configInfo = document.createElement("div");
+    configInfo.className = "space-y-1";
 
     if (!!configuration.urls) {
       const paragraph = document.createElement("p");
+      paragraph.className = "text-gray-700";
       paragraph.innerText = "urls: " + configuration.urls;
-      configContainer.appendChild(paragraph);
+      configInfo.appendChild(paragraph);
     }
 
     if (!!configuration.username) {
       const paragraph = document.createElement("p");
+      paragraph.className = "text-gray-700";
       paragraph.innerText = "username: " + configuration.username;
-      configContainer.appendChild(paragraph);
+      configInfo.appendChild(paragraph);
     }
 
     if (!!configuration.credential) {
       const paragraph = document.createElement("p");
+      paragraph.className = "text-gray-700";
       paragraph.innerText = "credential: " + configuration.credential;
-      configContainer.appendChild(paragraph);
+      configInfo.appendChild(paragraph);
     }
 
+    configContainer.appendChild(configInfo);
+
     const deleteButton = document.createElement("button");
-    deleteButton.textContent = "remove";
-    deleteButton.onclick = () => removeConfig(index)
+    deleteButton.textContent = "Remove";
+    deleteButton.className = "px-4 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black";
+    deleteButton.onclick = () => removeConfig(index);
     configContainer.appendChild(deleteButton);
 
     container.appendChild(configContainer);
@@ -130,8 +139,8 @@ function toggleButton(id, status) {
   document.getElementById(id).disabled = !status;
 }
 
-function toggleElement(id, status) {
-  document.getElementById(id).style.display = status ? "inline-block" : "none";
+function toggleElement(id, status, flex) {
+  document.getElementById(id).style.display = status ? flex ? "flex" : "inline-block" : "none";
 }
 
 function handleChannelName(event) {
@@ -168,7 +177,14 @@ async function startMicCapture() {
 
 function toggleSettings() {
   displaySettings = !displaySettings;
-  document.getElementById("settings-container").style.visibility = displaySettings ? "visible" : "hidden";
+
+  const settings = document.getElementById("settings-container");
+  settings.style.display = displaySettings ? "block" : "none";
+  settings.style.visibility = displaySettings ? "visible" : "hidden";
+
+  if (displaySettings) {
+    loadConfig();
+  }
 }
 
 async function startShare() {
@@ -190,8 +206,9 @@ async function startShare() {
   }
 
   toggleButton("share", false);
-  toggleButton("stop", true)
-  toggleElement("viewers", true);
+  toggleButton("stop", true);
+  toggleButton("settings", false);
+  toggleElement("viewers", true, true);
   toggleElement("overlay-text", true);
 
   document.getElementById("video").srcObject = captureStream;
@@ -318,6 +335,7 @@ function updateViewers(type) {
 function stopShare() {
   toggleButton("share", true);
   toggleButton("stop", false);
+  toggleButton("settings", true);
   toggleElement("viewers", false);
   toggleElement("overlay-text", false);
 

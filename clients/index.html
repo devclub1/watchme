@@ -1,21 +1,30 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>watchme</title>
-  <style>
-    .container {
-      margin: 0 auto;
-      text-align: center;
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-  <div class="container">
-    <h3>watchme</h3>
-    <p><a href="./share/">share your screen</a></p>
-    <a href="./view/">view someone's screen</a></p>
+<body class="bg-gray-50 min-h-screen">
+  <div class="flex flex-col items-center justify-center min-h-screen">
+    <div class="text-center space-y-8">
+      <h1 class="text-4xl font-bold text-gray-800 mb-8">watchme</h1>
+      
+      <div class="space-y-4">
+        <a href="./share/" 
+           class="block w-64 px-6 py-3 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black">
+          share your screen
+        </a>
+        
+        <a href="./view/" 
+           class="block w-64 px-6 py-3 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black">
+          view someone's screen
+        </a>
+      </div>
+    </div>
   </div>
 </body>
 
