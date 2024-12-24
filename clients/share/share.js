@@ -139,8 +139,8 @@ function toggleButton(id, status) {
   document.getElementById(id).disabled = !status;
 }
 
-function toggleElement(id, status) {
-  document.getElementById(id).style.display = status ? "inline-block" : "none";
+function toggleElement(id, status, flex) {
+  document.getElementById(id).style.display = status ? flex ? "flex" : "inline-block" : "none";
 }
 
 function handleChannelName(event) {
@@ -208,7 +208,7 @@ async function startShare() {
   toggleButton("share", false);
   toggleButton("stop", true);
   toggleButton("settings", false);
-  toggleElement("viewers", true);
+  toggleElement("viewers", true, true);
   toggleElement("overlay-text", true);
 
   document.getElementById("video").srcObject = captureStream;

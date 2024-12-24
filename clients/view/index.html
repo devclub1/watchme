@@ -47,9 +47,9 @@
     </div>
 
     <!-- Video Container -->
-    <div class="relative w-full justify-center">
-        <div class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden max-w-[90vw] max-h-[90vh] min-w-[320px] min-h-[180px]">
-            <video id="remoteVideo" 
+    <div id="video-container" class="relative w-full justify-center">
+        <div class="w-full h-fullbg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden max-w-[90vw] max-h-[90vh] min-w-[320px] min-h-[180px]">
+            <video id="remote-video" 
                    class="w-full h-full object-contain"
                    playsinline 
                    autoplay></video>
@@ -57,7 +57,7 @@
     </div>
 
     <!-- Settings Container -->
-    <div id="settings-container" class="space-y-6 bg-white p-6 rounded-lg shadow-md hidden invisible">
+    <div id="settings-container" class="hidden space-y-6 bg-white p-6 rounded-lg shadow-md">
       <h2 class="text-xl font-bold text-gray-800">Configurations</h2>
       <div id="configurations-container" class="space-y-2"></div>
       <div class="flex space-x-3">

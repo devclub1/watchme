@@ -17,6 +17,10 @@ function toggleButton(id, status) {
   document.getElementById(id).disabled = !status;
 }
 
+function toggleElement(id, status) {
+  document.getElementById(id).classList.toggle("hidden", !status);
+}
+
 window.addEventListener('load', () => {
   const channel = document.getElementById("channel");
 
@@ -81,10 +85,7 @@ function loadConfig() {
 
 function toggleSettings() {
   displaySettings = !displaySettings;
-
-  const settings = document.getElementById("settings-container");
-  settings.style.display = displaySettings ? "block" : "none";
-  settings.style.visibility = displaySettings ? "visible" : "hidden";
+  toggleElement("settings-container", displaySettings);
 
   if (displaySettings) {
     loadConfig();
@@ -145,7 +146,7 @@ function joinChannel() {
   socket.on("no-channel", () => {
     shouldDisconnect = true;
     socket.disconnect();
-    alert("channel does not exist");
+    alert("The stream has ended");
   })
 
   socket.on("webrtc-offer", async (payload) => {
@@ -163,8 +164,9 @@ function joinChannel() {
     peerConnection.ontrack = (event) => {
       console.log("Track event received:", event);
       const mediaStream = event.streams[0];
-      const remoteVideo = document.getElementById("remoteVideo");
+      const remoteVideo = document.getElementById("remote-video");
       remoteVideo.srcObject = mediaStream;
+      remoteVideo.controls = true;
       remoteVideo.style.transform = 'translateZ(0)';
     };
 
@@ -199,7 +201,7 @@ function joinChannel() {
           toggleButton("join", false);
           toggleButton("fullscreen", true);
           toggleButton("stop", true);
-          toggleButton("settings", false);
+          toggleButton("settings", false);          
           break;
         case "disconnected":
           if (shouldDisconnect) {
@@ -228,14 +230,15 @@ function joinChannel() {
 
 function toFullscreen() {
   if (!document.fullscreenElement) {
-    const remoteVideo = document.getElementById("remoteVideo");
+    const remoteVideo = document.getElementById("remote-video");
     remoteVideo.requestFullscreen();
   }
 }
 
 function closeVideo() {
-  const remoteVideo = document.getElementById("remoteVideo");
+  const remoteVideo = document.getElementById("remote-video");
   remoteVideo.srcObject = null;
+  remoteVideo.controls = false;
   socket.disconnect();
   peerConnection.close();
 
