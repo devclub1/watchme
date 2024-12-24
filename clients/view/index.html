@@ -48,8 +48,7 @@
 
     <!-- Video Container -->
     <div class="relative w-full justify-center">
-        <div class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden" 
-             style="max-width: 90vw; max-height: 90vh; min-width: 320px; min-height: 180px;">
+        <div class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden max-w-[90vw] max-h-[90vh] min-w-[320px] min-h-[180px]">
             <video id="remoteVideo" 
                    class="w-full h-full object-contain"
                    playsinline 
@@ -58,9 +57,7 @@
     </div>
 
     <!-- Settings Container -->
-    <div id="settings-container" 
-         class="space-y-6 bg-white p-6 rounded-lg shadow-md" 
-         style="visibility: hidden; display: none;">
+    <div id="settings-container" class="space-y-6 bg-white p-6 rounded-lg shadow-md hidden invisible">
       <h2 class="text-xl font-bold text-gray-800">Configurations</h2>
       <div id="configurations-container" class="space-y-2"></div>
       <div class="flex space-x-3">
