@@ -41,29 +41,38 @@ function loadConfig() {
 
   configurations.forEach((configuration, index) => {
     const configContainer = document.createElement("div");
-    configContainer.style.margin = "20px";
+    configContainer.className = "flex justify-between items-center p-4 rounded-lg";
+
+    const configInfo = document.createElement("div");
+    configInfo.className = "space-y-1";
 
     if (!!configuration.urls) {
       const paragraph = document.createElement("p");
+      paragraph.className = "text-gray-700";
       paragraph.innerText = "urls: " + configuration.urls;
-      configContainer.appendChild(paragraph);
+      configInfo.appendChild(paragraph);
     }
 
     if (!!configuration.username) {
       const paragraph = document.createElement("p");
+      paragraph.className = "text-gray-700";
       paragraph.innerText = "username: " + configuration.username;
-      configContainer.appendChild(paragraph);
+      configInfo.appendChild(paragraph);
     }
 
     if (!!configuration.credential) {
       const paragraph = document.createElement("p");
+      paragraph.className = "text-gray-700";
       paragraph.innerText = "credential: " + configuration.credential;
-      configContainer.appendChild(paragraph);
+      configInfo.appendChild(paragraph);
     }
 
+    configContainer.appendChild(configInfo);
+
     const deleteButton = document.createElement("button");
-    deleteButton.textContent = "remove";
-    deleteButton.onclick = () => removeConfig(index)
+    deleteButton.textContent = "Remove";
+    deleteButton.className = "px-4 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black";
+    deleteButton.onclick = () => removeConfig(index);
     configContainer.appendChild(deleteButton);
 
     container.appendChild(configContainer);
@@ -190,6 +199,7 @@ function joinChannel() {
           toggleButton("join", false);
           toggleButton("fullscreen", true);
           toggleButton("stop", true);
+          toggleButton("settings", false);
           break;
         case "disconnected":
           if (shouldDisconnect) {
@@ -234,4 +244,5 @@ function closeVideo() {
   toggleButton("fullscreen", false);
   toggleButton("stop", false);
   toggleButton("join", true);
+  toggleButton("settings", true);
 }

@@ -3,49 +3,110 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>watchme - viewer</title>
-  <style>
-    #remoteVideo {
-      margin-top: 5px;
-      width: 95vw;
-      height: 90vh;
-    }
-
-    #settings-container {
-      margin: 10px;
-      display: none;
-      visibility: hidden;
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
 </head>
 
-<body>
-  <div>
-    <input id="channel" type="text" placeholder="Channel name" onkeyup="handleChannelName(event)" />
-    <button id="join" disabled onclick="joinChannel()">Join channel</button>
-    <button id="fullscreen" disabled onclick="toFullscreen()">Fullscreen</button>
-    <button id="stop" disabled onclick="closeVideo()">Stop video</button>
-    <button id="settings" onclick="toggleSettings()">Settings</button>
-  </div>
-  <div id="settings-container">
-    <p>Configurations</p>
-    <div id="configurations-container">
+<body class="bg-gray-50 min-h-screen p-8">
+  <div class="max-w-2xl mx-auto space-y-6">
+    <!-- Header Controls -->
+    <div class="flex flex-col space-y-4">
+      <input id="channel" 
+             type="text" 
+             placeholder="Channel name" 
+             onkeyup="handleChannelName(event)"
+             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black" />
+      
+      <div class="flex space-x-3">
+        <button id="join" 
+                disabled 
+                onclick="joinChannel()"
+                class="px-6 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black disabled:opacity-50 disabled:cursor-not-allowed">
+          Join channel
+        </button>
+        <button id="fullscreen" 
+                disabled 
+                onclick="toFullscreen()"
+                class="px-6 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black disabled:opacity-50 disabled:cursor-not-allowed">
+          Fullscreen
+        </button>
+        <button id="stop" 
+                disabled 
+                onclick="closeVideo()"
+                class="px-6 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black disabled:opacity-50 disabled:cursor-not-allowed">
+          Stop video
+        </button>
+        <button id="settings" 
+                onclick="toggleSettings()"
+                class="px-6 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black disabled:opacity-50 disabled:cursor-not-allowed">
+          Settings
+        </button>
+      </div>
     </div>
-    <button id="add-config" onclick="toggleModal(true)">Add
-      configuration</button>
-    <button id="reset-config" onclick="resetConfig()">Reset configuration</button>
+
+    <!-- Video Container -->
+    <div class="relative w-full justify-center">
+        <div class="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden" 
+             style="max-width: 90vw; max-height: 90vh; min-width: 320px; min-height: 180px;">
+            <video id="remoteVideo" 
+                   class="w-full h-full object-contain"
+                   playsinline 
+                   autoplay></video>
+        </div>
+    </div>
+
+    <!-- Settings Container -->
+    <div id="settings-container" 
+         class="space-y-6 bg-white p-6 rounded-lg shadow-md" 
+         style="visibility: hidden; display: none;">
+      <h2 class="text-xl font-bold text-gray-800">Configurations</h2>
+      <div id="configurations-container" class="space-y-2"></div>
+      <div class="flex space-x-3">
+        <button onclick="toggleModal(true)"
+                class="px-4 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black">
+          Add configuration
+        </button>
+        <button onclick="resetConfig()"
+                class="px-4 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black">
+          Reset configuration
+        </button>
+      </div>
+    </div>
+
+    <!-- Configuration Dialog -->
+    <dialog id="add-config-dialog" class="p-6 rounded-lg shadow-xl backdrop:bg-gray-500/50">
+      <form onsubmit="submitNewConfiguration(event)" class="space-y-4">
+        <div class="space-y-4">
+          <input type="text" 
+                 name="urls" 
+                 placeholder="URL"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black" />
+          <input type="text" 
+                 name="username" 
+                 placeholder="Username"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black" />
+          <input type="text" 
+                 name="credential" 
+                 placeholder="Credential"
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black" />
+        </div>
+        <div class="flex space-x-3">
+          <button type="submit"
+                  class="px-4 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black">
+            Add
+          </button>
+          <button type="button" 
+                  onclick="toggleModal(false)"
+                  class="px-4 py-2 text-white bg-black rounded-lg hover:bg-white hover:text-black transition-colors duration-200 shadow-md border border-black">
+            Close
+          </button>
+        </div>
+      </form>
+    </dialog>
   </div>
-  <video id="remoteVideo" playsinline autoplay></video>
-  <dialog id="add-config-dialog">
-    <form onsubmit="submitNewConfiguration(event)">
-      <input type="text" name="urls" placeholder="url" />
-      <input type="text" name="username" placeholder="username" />
-      <input type="text" name="credential" placeholder="credential" />
-      <input type="submit" value="Add" />
-      <button type="button" onclick="toggleModal(false)">Close</button>
-    </form>
-  </dialog>
-  <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
+
   <script src="./view.js"></script>
 </body>
 
