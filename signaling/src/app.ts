@@ -13,5 +13,5 @@ app.use(express.static("../clients"));
 WebSocketManager.attach(server);
 
 server.listen(PORT, () => {
-  console.log(`Server is running o port ${PORT}`);
+  console.log(`Server is running of port ${PORT}`);
 });

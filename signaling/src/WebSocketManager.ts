@@ -36,9 +36,18 @@ interface ServerEvent {
   "ice-candidate": (payload: ICEPayload) => void;
 }
 
+interface RoomData {
+  sharer: string;
+  viewers: string[];
+}
+
+function toImmutableSnapshot<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 class WebSocketManager {
     #io: Server;
-    #rooms: Record<string, { sharer: string, viewers: string[] }>;
+    #rooms: Record<string, RoomData>;
 
     constructor(server: http.Server) {
       this.#io = new Server<ClientEvent, ServerEvent>(server);
@@ -47,9 +56,14 @@ class WebSocketManager {
       this.#initializeHandlers();
     }
 
+    public get rooms(): Record<string, RoomData> {
+      return toImmutableSnapshot<Record<string, RoomData>>(this.#rooms);
+    }
+
     static attach(server: http.Server) {
-      new WebSocketManager(server);
       console.log("WebSocketManager instance attached to server");
+
+      return new WebSocketManager(server);
     }
 
     #initializeHandlers() {
