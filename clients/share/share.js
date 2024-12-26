@@ -229,36 +229,18 @@ async function startShare() {
       iceCandidatePoolSize: 10
     });
 
-    const videoEncodings = [
-      {
-        rid: 'high',
-        maxBitrate: 3000000,
-        maxFramerate: 60,
-        scaleResolutionDownBy: 1
-      },
-      {
-        rid: 'medium',
-        maxBitrate: 1000000,
-        maxFramerate: 30,
-        scaleResolutionDownBy: 2
-      },
-      {
-        rid: 'low',
-        maxBitrate: 500000,
-        maxFramerate: 15,
-        scaleResolutionDownBy: 4
-      }
-    ];
-
     captureStream.getTracks().forEach(track => {
       if (track.kind === 'video') {
-        const sender = peerConnection.addTrack(track, captureStream);
-        
-        const params = sender.getParameters();
-        params.encodings = videoEncodings;
-        sender.setParameters(params);
-
-        console.log("Added device video track with simulcast encodings");
+        peerConnection.addTransceiver(track, {
+          direction: 'sendonly',
+          streams: [captureStream],
+          sendEncodings: [{
+            scalabilityMode: 'L3T3',
+            maxBitrate: 3000000,
+            maxFramerate: 60
+          }]
+        });
+        console.log("Added video tracks");
       } else {
         peerConnection.addTrack(track, captureStream);
         console.log("Added device audio track");
