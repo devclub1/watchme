@@ -47,6 +47,11 @@ class WebSocketManager {
       this.#initializeHandlers();
     }
 
+    static attach(server: http.Server) {
+      new WebSocketManager(server);
+      console.log("WebSocketManager instance attached to server");
+    }
+
     #initializeHandlers() {
       this.#io.on("connection", (socket: Socket<ClientEvent, ServerEvent>) => {
         console.log("New client connected:", socket.id);

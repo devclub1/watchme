@@ -10,10 +10,8 @@ const server = http.createServer(app);
 
 app.use(express.static("../clients"));
 
-const webSocketManager = new WebSocketManager(server);
+WebSocketManager.attach(server);
 
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running o port ${PORT}`);
 });
-
-export { app };
