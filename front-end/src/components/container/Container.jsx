@@ -4,7 +4,7 @@ import Dashboard from "../dashboard/Dashboard"
 
 import { BrowserRouter, Route, Routes } from "react-router"
 import Footer from "../footer/Footer"
-import SharerBoard from "../sharer-board/SharerBoard"
+import ControlBoard from "../control-board/ControlBoard"
 
 const Container = () => {
     return (
@@ -13,8 +13,8 @@ const Container = () => {
                 <BrowserRouter>
                     <Routes>
                         <Route key="dashboard" path="/" element={<Dashboard />} />
-                        <Route key="share" path="/share/*" element={<SharerBoard mode="share" />} />
-                        <Route key="view" path="/view/*" element={<SharerBoard mode="view" />} />
+                        <Route key="share" path="/share/*" element={<ControlBoard mode="share" />} />
+                        <Route key="view" path="/view/*" element={<ControlBoard mode="view" />} />
                     </Routes>
                 </BrowserRouter>
             </div>

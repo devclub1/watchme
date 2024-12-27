@@ -6,7 +6,7 @@ import SharerManager from "../../sockets/SharerManager";
 import ViewerManager from "../../sockets/ViewerManager";
 import { defaultConfigurations } from "../../data/defaults";
 
-const SharerBoard = (props) => {
+const ControlBoard = (props) => {
     const [wsManager, setWsManager] = useState(null);
 
     const [channelName, setChannelName] = useState("");
@@ -14,6 +14,7 @@ const SharerBoard = (props) => {
     const [showSettings, setShowSettings] = useState(false);
 
     const [viewersCount, setViewersCount] = useState(0);
+    const [videoStream, setVideoStream] = useState(null);
 
     const [systemAudio, setSystemAudio] = useState(false);
     const [micAudio, setMicAudio] = useState(false);
@@ -36,11 +37,11 @@ const SharerBoard = (props) => {
     }, []);
 
     const start = () => {
-        console.log("start")
+        wsManager.connect(channelName, systemAudio, micAudio, { setVideoStream: setVideoStream, setIsActive: setIsActive });
     }
 
     const stop = () => {
-        console.log("stop")
+        wsManager.disconnect({ setVideoStream: setVideoStream, setIsActive: setIsActive, setViewersCount: setViewersCount });
     }
 
     return (
@@ -68,7 +69,7 @@ const SharerBoard = (props) => {
                 ]
             }} />
 
-            <Video mode={props.mode} isActive={isActive} viewersCount={viewersCount} />
+            <Video mode={props.mode} isActive={isActive} videoStream={videoStream} viewersCount={viewersCount} />
 
             {showSettings && (
                 <Settings {...{
@@ -84,4 +85,4 @@ const SharerBoard = (props) => {
     )
 }
 
-export default SharerBoard;
+export default ControlBoard;
