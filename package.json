@@ -4,9 +4,10 @@
   "description": "share your screen without headaches",
   "main": "signaling/app.js",
   "scripts": {
+    "install": "cd signaling; npm install",
     "start": "cd signaling; npm start",
     "dev": "cd signaling; npm run dev",
-    "install": "cd signaling; npm install"
+    "test": "cd signaling; npm test"
   },
   "repository": {
     "type": "git",
