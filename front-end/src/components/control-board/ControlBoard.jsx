@@ -25,7 +25,15 @@ const ControlBoard = (props) => {
         if (!!storedConfigurations) {
             setConfigurations(JSON.parse(storedConfigurations));
         }
+    }, []);
 
+    useEffect(() => {
+        if (wsManager) {
+            wsManager.connect(channelName, configurations, setIsActive, setVideoStream, setViewersCount, systemAudio, micAudio);
+        }
+    }, [wsManager]);
+
+    const start = () => {
         switch (props.mode) {
             case "share":
                 setWsManager(new SharerManager());
@@ -34,14 +42,11 @@ const ControlBoard = (props) => {
                 setWsManager(new ViewerManager());
                 break;
         }
-    }, []);
-
-    const start = () => {
-        wsManager.connect(channelName, systemAudio, micAudio, { setVideoStream: setVideoStream, setIsActive: setIsActive });
     }
 
     const stop = () => {
-        wsManager.disconnect({ setVideoStream: setVideoStream, setIsActive: setIsActive, setViewersCount: setViewersCount });
+        wsManager.disconnect(setIsActive, setVideoStream, setViewersCount);
+        setWsManager(null);
     }
 
     return (
