@@ -10,6 +10,7 @@ interface JoinMessage {
 interface WebRTCPayload {
   target: string;
   channel: string;
+  offer?: RTCSessionDescription;
   from?: string;
 }
 
@@ -64,6 +65,10 @@ class WebSocketManager {
       console.log("WebSocketManager instance attached to server");
 
       return new WebSocketManager(server);
+    }
+
+    static detach(wsManager: WebSocketManager) {
+      wsManager.#io.close();
     }
 
     #initializeHandlers() {
