@@ -84,6 +84,7 @@ class ViewerManager {
                     case "closed":
                     case "failed":
                         this.disconnect(setIsActive, setVideoStream);
+                        break;
                 }
             }
 
