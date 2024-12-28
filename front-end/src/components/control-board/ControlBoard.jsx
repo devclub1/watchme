@@ -50,44 +50,48 @@ const ControlBoard = (props) => {
     }
 
     return (
-        <div className="w-8/12 space-y-6 p-8">
-            <Menu {...{
-                channelName: channelName,
-                setChannelName: setChannelName,
-                setIsActive: setIsActive,
-                buttons: [
-                    {
-                        text: props.mode === "share" ? "Start share" : "Join channel",
-                        onClick: start,
-                        disabled: isActive || !channelName,
-                    },
-                    {
-                        text: props.mode === "share" ? "Stop share" : "Leave channel",
-                        onClick: stop,
-                        disabled: !isActive,
-                    },
-                    {
-                        text: "Settings",
-                        onClick: () => setShowSettings(!showSettings),
-                        disabled: isActive,
-                    },
-                ]
-            }} />
-
-            <Video mode={props.mode} isActive={isActive} videoStream={videoStream} viewersCount={viewersCount} />
-
-            {showSettings && (
-                <Settings {...{
-                    mode: props.mode,
-                    systemAudio: systemAudio,
-                    setSystemAudio: setSystemAudio,
-                    micAudio: micAudio,
-                    setMicAudio: setMicAudio,
-                    configurations: configurations,
-                    setConfigurations: setConfigurations
+        <>
+            <div className="max-w-2xl mx-auto space-y-6">
+                <Menu {...{
+                    channelName: channelName,
+                    setChannelName: setChannelName,
+                    setIsActive: setIsActive,
+                    buttons: [
+                        {
+                            text: props.mode === "share" ? "Start share" : "Join channel",
+                            onClick: start,
+                            disabled: isActive || !channelName,
+                        },
+                        {
+                            text: props.mode === "share" ? "Stop share" : "Leave channel",
+                            onClick: stop,
+                            disabled: !isActive,
+                        },
+                        {
+                            text: "Settings",
+                            onClick: () => setShowSettings(!showSettings),
+                            disabled: isActive,
+                        },
+                    ]
                 }} />
-            )}
-        </div>
+            </div>
+
+            <Video mode={props.mode} isActive={isActive} videoStream={videoStream} viewersCount={viewersCount} resizable={props.mode === "view"} />
+
+            <div className="max-w-2xl mx-auto space-y-6">
+                {showSettings && (
+                    <Settings {...{
+                        mode: props.mode,
+                        systemAudio: systemAudio,
+                        setSystemAudio: setSystemAudio,
+                        micAudio: micAudio,
+                        setMicAudio: setMicAudio,
+                        configurations: configurations,
+                        setConfigurations: setConfigurations
+                    }} />
+                )}
+            </div>
+        </>
     )
 }
 

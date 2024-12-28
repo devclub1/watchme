@@ -11,9 +11,9 @@ const Video = (props) => {
 
     return (
         <>
-            <div className="relative w-full mt-4">
-                <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-                    <video ref={refVideo} className="w-full rounded-lg shadow-lg" playsInline autoPlay
+            <div className={"relative w-full " + (props.resizable ? 'p-6 justify-center' : 'max-w-2xl mt-4 mx-auto')} >
+                <div className={"bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden " + (props.resizable ? 'block w-[50vw] h-[60vh] max-w-[80vw] max-h-[90vh] min-w-[30vw] min-h-[30vh] mx-auto resize' : 'mx-auto')}>
+                    <video ref={refVideo} className={"w-full " + (props.resizable ? 'h-full object-contain' : '')} playsInline autoPlay
                         controls={props.mode === "view" && props.isActive}
                         muted={props.mode === "share"}>
                     </video>
@@ -23,13 +23,12 @@ const Video = (props) => {
                         </p>
                     </div>}
                 </div>
+                {props.mode === "share" && props.isActive && (
+                    <div className="text-gray-700 font-medium flex justify-end mt-4">
+                        <span>Number of viewers: {props.viewersCount}</span>
+                    </div>
+                )}
             </div>
-
-            {props.mode === "share" && props.isActive && (
-                <div className="text-gray-700 font-medium flex justify-end">
-                    <span>Number of viewers: {props.viewersCount}</span>
-                </div>
-            )}
         </>
     )
 }
