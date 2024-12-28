@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import { signalingServer } from "../data/defaults";
 
 class ViewerManager {
     #socket = null;
@@ -7,7 +8,7 @@ class ViewerManager {
 
     constructor() {
         console.log("init viewer manager");
-        this.#socket = io("http://localhost:3000");
+        this.#socket = io(signalingServer);
     }
 
     async connect(channelName, configurations, setIsActive, setVideoStream) {
@@ -22,7 +23,7 @@ class ViewerManager {
 
     async attachSocketHandlers(channelName, configurations, setIsActive, setVideoStream) {
         this.#socket.on("no-channel", () => {
-            // this.disconnect(setIsActive, setVideoStream);
+            this.disconnect(setIsActive, setVideoStream);
             alert("The stream has ended");
         });
 
@@ -82,7 +83,7 @@ class ViewerManager {
                         }
                     case "closed":
                     case "failed":
-                        // this.disconnect(setIsActive, setVideoStream);
+                        this.disconnect(setIsActive, setVideoStream);
                 }
             }
 
@@ -103,7 +104,9 @@ class ViewerManager {
     }
 
     disconnect(setIsActive, setVideoStream) {
-        this.#socket.disconnect();
+        if (this.#socket) {
+            this.#socket.disconnect();
+        }
 
         if (this.#peerConnection) {
             this.#peerConnection.close();

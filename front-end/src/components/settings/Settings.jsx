@@ -26,7 +26,7 @@ const Settings = (props) => {
 
   const resetConfigurations = () => {
     localStorage.setItem("configurations", JSON.stringify(defaultConfigurations));
-    setConfigurations(defaultConfigurations);
+    props.setConfigurations(defaultConfigurations);
 }
 
   return (

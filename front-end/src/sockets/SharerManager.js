@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import { signalingServer } from "../data/defaults";
 
 class SharerManager {
     #socket = null;
@@ -10,7 +11,7 @@ class SharerManager {
 
     constructor() {
         console.log("init sharer manager");
-        this.#socket = io("http://localhost:3000");
+        this.#socket = io(signalingServer);
     }
 
     connect(channelName, configurations, setIsActive, setVideoStream, setViewersCount, captureSystemAudio, captureMic) {

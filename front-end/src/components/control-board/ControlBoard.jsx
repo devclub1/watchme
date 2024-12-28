@@ -18,7 +18,7 @@ const ControlBoard = (props) => {
 
     const [systemAudio, setSystemAudio] = useState(false);
     const [micAudio, setMicAudio] = useState(false);
-    const [configurations, setConfigurations] = useState(defaultConfigurations);
+    const [configurations, setConfigurations] = useState(JSON.parse(JSON.stringify(defaultConfigurations)));
 
     useEffect(() => {
         const storedConfigurations = localStorage.getItem("configurations");

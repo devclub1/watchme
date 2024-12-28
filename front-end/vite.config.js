@@ -5,7 +5,7 @@ import autoprefixer from 'autoprefixer'
 
 export default defineConfig({
   server: {
-    host: 'localhost'
+    host: '0.0.0.0'
   },
   plugins: [react()],
   css: {
