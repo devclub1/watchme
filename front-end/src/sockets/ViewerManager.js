@@ -11,7 +11,6 @@ class ViewerManager {
     }
 
     async connect(channelName, configurations, setIsActive, setVideoStream) {
-        // await this.#socket.connect();
         this.joinChannel(channelName, configurations, setIsActive, setVideoStream);
     }
 
@@ -33,6 +32,7 @@ class ViewerManager {
 
             this.#peerConnection = new RTCPeerConnection({
                 iceServers: configurations,
+                iceTransportPolicy: "all",
                 bundlePolicy: "max-bundle",
                 rtcpMuxPolicy: "require",
                 sdpSemantics: "unified-plan",
@@ -51,7 +51,7 @@ class ViewerManager {
             await this.#peerConnection.setLocalDescription(answer);
 
             this.#peerConnection.onicecandidate = (event) => {
-                console.log("ICE received");
+                console.log("ICE received", event.candidate);
                 if (event.candidate) {
                     this.#socket.emit("ice-candidate", {
                         channel: channelName,
@@ -60,7 +60,7 @@ class ViewerManager {
                         candidate: event.candidate
                     });
 
-                    console.log("Sent ICE candidate to sharer:", this.#socket.id);
+                    console.log("Sent ICE candidate to sharer:", event.candidate);
                 }
             };
 
@@ -82,7 +82,7 @@ class ViewerManager {
                         }
                     case "closed":
                     case "failed":
-                        this.disconnect(setIsActive, setVideoStream);
+                        // this.disconnect(setIsActive, setVideoStream);
                 }
             }
 
@@ -96,7 +96,7 @@ class ViewerManager {
         this.#socket.on("ice-candidate", (payload) => {
             if (this.#peerConnection) {
                 this.#peerConnection.addIceCandidate(new RTCIceCandidate(payload.candidate))
-                    .then(() => console.log("Added ICE candidate from sharer:", payload.from))
+                    .then(() => console.log("Added ICE candidate from sharer:", payload.candidate))
                     .catch(error => console.error("Error adding ICE candidate:", error));
             }
         });

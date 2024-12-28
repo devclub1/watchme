@@ -50,6 +50,7 @@ class SharerManager {
         this.#socket.on("user-joined", async (socketId) => {
             const peerConnection = new RTCPeerConnection({
                 iceServers: configurations,
+                iceTransportPolicy: "all",
                 bundlePolicy: "max-bundle",
                 rtcpMuxPolicy: "require",
                 sdpSemantics: "unified-plan",
@@ -96,7 +97,7 @@ class SharerManager {
                         candidate: event.candidate
                     });
 
-                    console.log("Sent ICE candidate to:", socketId);
+                    console.log("Sent ICE candidate to:", event.candidate);
                 }
             };
 
@@ -130,7 +131,7 @@ class SharerManager {
         
         this.#socket.on("ice-candidate", (payload) => {
             this.#peerConnections[payload.from].addIceCandidate(new RTCIceCandidate(payload.candidate))
-              .then(() => console.log("Added ICE candidate from viewer"))
+              .then(() => console.log("Added ICE candidate from viewer", payload.candidate))
               .catch(error => console.error("Error adding ICE candidate:", error));
           });
     }

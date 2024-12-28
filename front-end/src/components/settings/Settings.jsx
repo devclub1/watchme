@@ -33,9 +33,11 @@ const Settings = (props) => {
     <>
       <div className="space-y-6 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-bold text-gray-800">Settings</h2>
-        <div className="space-y-3">
-          <div className="flex items-center space-x-2">
-            <input type="checkbox"
+
+        {props.mode === "share" && (
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <input type="checkbox"
               checked={props.systemAudio}
               onChange={() => props.setSystemAudio(!props.systemAudio)}
               className="w-4 h-4 text-black rounded focus:ring-black" />
@@ -50,8 +52,9 @@ const Settings = (props) => {
             <label className="text-gray-700" title="Microphone cannot be enabled after a stream has started">
               Microphone audio
             </label>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-800">Configurations</h3>

@@ -1,5 +1,3 @@
-import "./container.css"
-
 import Dashboard from "../dashboard/Dashboard"
 
 import { BrowserRouter, Route, Routes } from "react-router"

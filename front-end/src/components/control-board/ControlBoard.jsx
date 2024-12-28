@@ -78,6 +78,7 @@ const ControlBoard = (props) => {
 
             {showSettings && (
                 <Settings {...{
+                    mode: props.mode,
                     systemAudio: systemAudio,
                     setSystemAudio: setSystemAudio,
                     micAudio: micAudio,
