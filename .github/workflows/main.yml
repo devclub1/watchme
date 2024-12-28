@@ -3,9 +3,15 @@ name: watchme-ci
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "be/**" ]
+    paths:
+      - ".github/workflows/**"
+      - "back-end/**"
   pull_request:
     branches: [ "main" ]
+    paths:
+      - ".github/workflows/**"
+      - "back-end/**"
 
 jobs:
   build:
