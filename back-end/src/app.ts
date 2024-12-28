@@ -1,0 +1,24 @@
+import express from "express";
+import http from "http";
+import path from "path";
+import { fileURLToPath } from "url";
+
+import { WebSocketManager } from "./WebSocketManager";
+
+const PORT = process.env.PORT || 3000;
+const FE_RELATIVE_LOCATION = process.env.FE_RELATIVE_LOCATION || "front-end/dist";
+const FE_ABSOLUTE_LOCATION = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..", FE_RELATIVE_LOCATION);
+
+const app = express();
+const server = http.createServer(app);
+
+WebSocketManager.attach(server);
+
+app.use(express.static(FE_ABSOLUTE_LOCATION));
+app.get('*', (_, res) => {
+  res.sendFile(path.join(FE_ABSOLUTE_LOCATION, 'index.html'));
+});
+
+server.listen(PORT, () => {
+  console.log(`Server is running of port ${PORT}`);
+});
