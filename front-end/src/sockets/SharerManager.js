@@ -1,4 +1,4 @@
-import { socket } from "./socket";
+import { io } from "socket.io-client";
 
 class SharerManager {
     #socket = null;
@@ -10,7 +10,7 @@ class SharerManager {
 
     constructor() {
         console.log("init sharer manager");
-        this.#socket = socket;
+        this.#socket = io("http://localhost:3000");
     }
 
     connect(channelName, configurations, setIsActive, setVideoStream, setViewersCount, captureSystemAudio, captureMic) {
@@ -78,7 +78,7 @@ class SharerManager {
 
             if (this.#captureMicStream) {
                 this.#captureMicStream.getTracks().forEach(track => {
-                    peerConnection.addTrack(track, this.#captureMicStream);
+                    peerConnection.addTrack(track, this.#captureStream);
                     console.log("Added mic track");
                 })
             }

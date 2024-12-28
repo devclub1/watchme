@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+
 class ViewerManager {
     #socket = null;
     #shouldDisconnect = false;
@@ -22,7 +23,7 @@ class ViewerManager {
 
     async attachSocketHandlers(channelName, configurations, setIsActive, setVideoStream) {
         this.#socket.on("no-channel", () => {
-            this.#socket.disconnect();
+            // this.disconnect(setIsActive, setVideoStream);
             alert("The stream has ended");
         });
 
@@ -38,11 +39,11 @@ class ViewerManager {
                 iceCandidatePoolSize: 10
             });
 
-            // this.#peerConnection.ontrack = (event) => {
-            //     console.log("Track event received:", event);
-            //     const mediaStream = event.streams[0];
-            //     setVideoStream(mediaStream);
-            // };
+            this.#peerConnection.ontrack = (event) => {
+                console.log("Track event received:", event);
+                const mediaStream = event.streams[0];
+                setVideoStream(mediaStream);
+            };
 
             await this.#peerConnection.setRemoteDescription(new RTCSessionDescription(payload.sdp));
 
@@ -68,7 +69,7 @@ class ViewerManager {
 
                 switch (this.#peerConnection.connectionState) {
                     case "connected":
-                        this.setIsActive(true);
+                        setIsActive(true);
                         break;
                     case "disconnected":
                         if (this.#shouldDisconnect) {
@@ -81,7 +82,7 @@ class ViewerManager {
                         }
                     case "closed":
                     case "failed":
-                        // this.disconnect(setIsActive, setVideoStream);
+                        this.disconnect(setIsActive, setVideoStream);
                 }
             }
 
@@ -103,7 +104,10 @@ class ViewerManager {
 
     disconnect(setIsActive, setVideoStream) {
         this.#socket.disconnect();
-        this.#peerConnection.close();
+
+        if (this.#peerConnection) {
+            this.#peerConnection.close();
+        }
 
         this.#shouldDisconnect = true;
         this.#peerConnection = null;
