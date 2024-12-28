@@ -1,0 +1,22 @@
+{
+  "name": "watchme",
+  "version": "1.0.0",
+  "description": "share your screen without headaches",
+  "main": "signaling/app.js",
+  "scripts": {
+    "install": "cd signaling; npm install",
+    "start": "cd signaling; npm start",
+    "dev": "cd signaling; npm run dev",
+    "test": "cd signaling; npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devclub1/watchme.git"
+  },
+  "author": "devclub1",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devclub1/watchme/issues"
+  },
+  "homepage": "https://github.com/devclub1/watchme#readme"
+}
