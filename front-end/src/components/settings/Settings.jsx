@@ -31,7 +31,7 @@ const Settings = (props) => {
 
   return (
     <>
-      <div className="space-y-6 bg-white p-6 rounded-lg shadow-md">
+      <div className="flex flex-col justify-center gap-4 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-bold text-gray-800">Settings</h2>
 
         {props.mode === "share" && (
@@ -79,7 +79,7 @@ const Settings = (props) => {
               </div>
             ))}
           </div>
-          <div className="flex space-x-3">
+          <div className="flex space-x-3 justify-around">
             <Button 
               text="Add configuration"
               onClick={() => setShowModal(true)}
@@ -103,7 +103,7 @@ const Settings = (props) => {
               <input type="text" name="credential" placeholder="Credential"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black" />
             </div>
-            <div className="flex space-x-3">
+            <div className="flex space-x-3 justify-around">
               <Button type="submit" text="Add" />
               <Button text="Close" onClick={() => setShowModal(false)} />
             </div>
