@@ -51,7 +51,7 @@ const ControlBoard = (props) => {
 
     return (
         <>
-            <div className="max-w-2xl mx-auto space-y-6">
+            <div className="max-w-2xl mx-auto">
                 <Menu {...{
                     channelName: channelName,
                     setChannelName: setChannelName,
@@ -78,7 +78,7 @@ const ControlBoard = (props) => {
 
             <Video mode={props.mode} isActive={isActive} videoStream={videoStream} viewersCount={viewersCount} resizable={props.mode === "view"} />
 
-            <div className="max-w-2xl mx-auto space-y-6">
+            <div className="max-w-2xl mx-auto mt-6">
                 {showSettings && (
                     <Settings {...{
                         mode: props.mode,

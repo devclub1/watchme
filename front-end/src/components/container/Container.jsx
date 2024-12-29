@@ -7,7 +7,7 @@ import ControlBoard from "../control-board/ControlBoard"
 const Container = () => {
     return (
         <>
-            <div className="flex flex-col flex-grow p-8">
+            <div className="flex-grow p-8">
                 <BrowserRouter>
                     <Routes>
                         <Route key="dashboard" path="/" element={<Dashboard />} />
