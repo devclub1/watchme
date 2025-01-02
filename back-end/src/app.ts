@@ -6,8 +6,8 @@ import { fileURLToPath } from "url";
 import { WebSocketManager } from "./WebSocketManager";
 
 const PORT = process.env.PORT || 3000;
-const FE_RELATIVE_LOCATION = process.env.FE_RELATIVE_LOCATION || "front-end/dist";
-const FE_ABSOLUTE_LOCATION = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..", FE_RELATIVE_LOCATION);
+const DEFAULT_FE_RELATIVE_LOCATION = "front-end/dist";
+const FE_ABSOLUTE_LOCATION = process.env.FE_LOCATION || path.join(path.dirname(fileURLToPath(import.meta.url)), "../..", DEFAULT_FE_RELATIVE_LOCATION);
 
 const app = express();
 const server = http.createServer(app);
