@@ -5,9 +5,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "start": "vite build && node dist/app.js",
-    "dev": "vite build --watch",
     "build": "vite build",
+    "dev": "vite build --watch",
     "test": "jest --coverage",
     "prod": "pm2 start dist/app.js --name watchme"
   },

@@ -5,8 +5,8 @@
   "main": "back-end/app.js",
   "scripts": {
     "install": "cd back-end; npm install; cd ../front-end; npm install",
-    "start": "cd front-end; npm run build; cd ../back-end; npm start",
-    "dev": "cd front-end; npm run build; cd ../back-end; npm run dev"
+    "dev": "cd front-end; npm run build; cd ../back-end; npm run dev",
+    "prod": "cd front-end; npm run build; cd ../back-end; npm run prod"
   },
   "repository": {
     "type": "git",
