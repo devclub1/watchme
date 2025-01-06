@@ -11,8 +11,8 @@ function serverRestartPlugin(): Plugin {
 
   return {
     name: 'server-restart',
-    buildEnd() {
-      if(!isWatchMode) {
+    writeBundle() {
+      if (!isWatchMode) {
         return
       }
 
