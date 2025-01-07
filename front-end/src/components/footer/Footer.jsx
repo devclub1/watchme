@@ -1,6 +1,6 @@
 const Footer = () => {
     return (
-        <div className="mx-auto py-4 text-center text-black text-sm group">
+        <div className="mx-auto py-4 text-center text-watchme-blue text-sm group">
             <div className="relative inline-block">
                 <span className="transition-opacity duration-1000 group-hover:opacity-0">//</span>
                 <div className="absolute bottom-0 -translate-x-1/2 whitespace-nowrap cursor-default opacity-0 transition-opacity duration-1000 group-hover:opacity-100">
