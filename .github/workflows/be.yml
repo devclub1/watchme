@@ -13,8 +13,7 @@ on:
       - "back-end/**"
 
 jobs:
-  build:
-
+  be-build:
     runs-on: ubuntu-latest
 
     strategy:
