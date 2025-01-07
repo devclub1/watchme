@@ -13,8 +13,7 @@ on:
       - "front-end/**"
 
 jobs:
-  build:
-
+  fe-build:
     runs-on: ubuntu-latest
 
     strategy:
