@@ -33,7 +33,7 @@
 
 #
 ### 2. Usage
-- The application defines 2 roles: 
+- The application defines 2 roles:
     - Sharer
     - Viewer
 
