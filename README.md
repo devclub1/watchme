@@ -1,4 +1,6 @@
-# watchme
+<div style="margin: 0 auto">
+    <img src="https://raw.githubusercontent.com/devclub1/watchme/main/front-end/src/assets/logo-watchme.png" alt="watchme" width="500px">
+</div>
 
 #### share your screen without headaches
 
