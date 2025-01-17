@@ -8,9 +8,6 @@ on:
       - "back-end/**"
   pull_request:
     branches: [ "main" ]
-    paths:
-      - ".github/workflows/be.yml"
-      - "back-end/**"
 
 jobs:
   be-build:

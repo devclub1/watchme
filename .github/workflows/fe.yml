@@ -8,9 +8,6 @@ on:
       - "front-end/**"
   pull_request:
     branches: [ "main" ]
-    paths:
-      - ".github/workflows/fe.yml"
-      - "front-end/**"
 
 jobs:
   fe-build:
