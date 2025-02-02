@@ -67,8 +67,11 @@ class WebSocketManager {
       return new WebSocketManager(server);
     }
 
-    static detach(wsManager: WebSocketManager) {
-      wsManager.#io.close();
+    static detach(wsManager: WebSocketManager, handler: () => void) {
+      if (!!wsManager && !!wsManager.#io) {
+        wsManager.#io.close()
+        .then(_ => handler());
+      }
     }
 
     #initializeHandlers() {

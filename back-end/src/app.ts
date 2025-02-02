@@ -1,10 +1,11 @@
-import "dotenv/config"
+import "dotenv/config"  
 import express from "express";
 import http from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 
 import { WebSocketManager } from "./WebSocketManager";
+import { attachGracefulShutdownHandler } from "./shutdown";
 
 const PORT = process.env.PORT || 3000;
 const DEFAULT_FE_RELATIVE_LOCATION = "front-end/dist";
@@ -12,8 +13,10 @@ const FE_ABSOLUTE_LOCATION = process.env.FE_LOCATION || path.join(path.dirname(f
 
 const app = express();
 const server = http.createServer(app);
+const wsManager = WebSocketManager.attach(server);
 
-WebSocketManager.attach(server);
+// TODO check this
+attachGracefulShutdownHandler(wsManager, server);
 
 app.use(express.static(FE_ABSOLUTE_LOCATION));
 app.get('*', (_, res) => {
